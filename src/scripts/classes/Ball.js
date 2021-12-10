@@ -31,10 +31,8 @@ export default class Ball {
     }
   }
   onCheckpoint(checkpoint) {
-    console.log('BOTTTOM!!!!')
     // Если мяч пересек нижнюю границу - значит игрок проиграл
     if (checkpoint == 'bottom') {
-      console.log('123')
 
       // Если это не последняя жизнь, то просто начинаем попытку заново
       if (this.scene.playerLife > 0) {

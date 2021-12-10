@@ -68,7 +68,7 @@ export default class GameScene extends Phaser.Scene {
             this.client.on('dataBall', ball => {
                 this.ball.ball.setX(ball.x)
                 this.ball.ball.setY(ball.y)
-                console.log(ball.x, ball.y)
+                // console.log(ball.x, ball.y)
 
                 // this.enemy.player.setX(data.x)
                 // this.enemy.player.setY(data.y)
