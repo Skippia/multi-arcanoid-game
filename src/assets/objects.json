@@ -1,0 +1,108 @@
+{"frames": [
+
+{
+	"filename": "ball",
+	"frame": {"x":1,"y":1,"w":64,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
+	"sourceSize": {"w":64,"h":64}
+},
+{
+	"filename": "black-square",
+	"frame": {"x":66,"y":1,"w":64,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
+	"sourceSize": {"w":64,"h":64}
+},
+{
+	"filename": "block",
+	"frame": {"x":131,"y":1,"w":64,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
+	"sourceSize": {"w":64,"h":64}
+},
+{
+	"filename": "block2",
+	"frame": {"x":196,"y":1,"w":64,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
+	"sourceSize": {"w":64,"h":64}
+},
+{
+	"filename": "blow",
+	"frame": {"x":1,"y":147,"w":128,"h":128},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":128,"h":128},
+	"sourceSize": {"w":128,"h":128}
+},
+{
+	"filename": "full-hp",
+	"frame": {"x":261,"y":1,"w":64,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
+	"sourceSize": {"w":64,"h":64}
+},
+{
+	"filename": "enemy",
+	"frame": {"x":1,"y":66,"w":192,"h":80},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":192,"h":80},
+	"sourceSize": {"w":192,"h":80}
+},
+{
+	"filename": "player",
+	"frame": {"x":194,"y":66,"w":192,"h":80},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":192,"h":80},
+	"sourceSize": {"w":192,"h":80}
+},
+{
+	"filename": "portal2-end",
+	"frame": {"x":130,"y":147,"w":160,"h":159},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":160,"h":159},
+	"sourceSize": {"w":160,"h":159}
+},
+{
+	"filename": "portal2-start",
+	"frame": {"x":291,"y":147,"w":160,"h":159},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":160,"h":159},
+	"sourceSize": {"w":160,"h":159}
+},
+{
+	"filename": "portal3-end",
+	"frame": {"x":1,"y":307,"w":160,"h":159},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":160,"h":159},
+	"sourceSize": {"w":160,"h":159}
+},
+{
+	"filename": "portal3-start",
+	"frame": {"x":162,"y":307,"w":160,"h":159},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":160,"h":159},
+	"sourceSize": {"w":160,"h":159}
+}],
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "objects.png",
+	"format": "RGBA8888",
+	"size": {"w":452,"h":467},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:fed490bc52fe9158690fbe95365c2a43:6c7f4d9e7c770f38a449c5b55f1341e0:8d6d12ff4d5234f2a4b19e0a906dbf52$"
+}
+}
