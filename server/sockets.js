@@ -8,6 +8,9 @@ module.exports = {
             socket.on('playerMove', data => {
                 this.onPlayerMove(socket, data)
             })
+            socket.on('ballMove', ball => {
+                this.onBallMove(socket, ball)
+            })
             this.onConnection(socket)
         })
     },
@@ -16,18 +19,34 @@ module.exports = {
         const session = this.sessions.find(session => session.playerSocket === socket || session.enemySocket === socket)
 
         if (session) {
-            let opponentSocket = null 
+            let opponentSocket = null
 
             if (session.playerSocket === socket) {
                 opponentSocket = session.enemySocket
             } else {
                 opponentSocket = session.playerSocket
             }
-
-            opponentSocket.emit('enemyMove', data)
+            if (opponentSocket) {
+                opponentSocket.emit('enemyMove', data)
+            }
         }
+    },
+    onBallMove(socket, ball) {
 
+        const session = this.sessions.find(session => session.playerSocket === socket || session.enemySocket === socket)
 
+        if (session) {
+            let opponentSocket = null
+
+            if (session.playerSocket === socket) {
+                opponentSocket = session.enemySocket
+            } else {
+                opponentSocket = session.playerSocket
+            }
+            if (opponentSocket) {
+                opponentSocket.emit('enemyBallMove', ball)
+            }
+        }
     },
     // находит сессию, в которой есть сокет игрока, но нет сокета противника (игрок ждет оппонента)
     getPendingSession() {

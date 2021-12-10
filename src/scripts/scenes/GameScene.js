@@ -19,7 +19,7 @@ export default class GameScene extends Phaser.Scene {
     constructor() {
         super('Game')
         this.GAMES_STATES = { 'PREPARATION': 'PREPARATION', 'START': 'START', 'TRY': 'TRY', 'FINISH': 'FINISH' }
-        this.gameState = this.GAMES_STATES['PREPARATION']
+        this.gameState = this.GAMES_STATES['START']
         // Game has not starting yet
         this.gameIsProcessing = false
         this.playerLife = 3
@@ -57,12 +57,21 @@ export default class GameScene extends Phaser.Scene {
         this.map = new Map(this)
         this.ball = new Ball(this, this.map)
         this.player = new Player(this, this.map, platform.player)
+        this.player.ball = this.ball.ball
 
         if (this.client) {
             this.enemy = new Player(this, this.map, platform.enemy)
             this.client.on('data', data => {
                 this.enemy.player.setX(data.x)
                 this.enemy.player.setY(data.y)
+            })
+            this.client.on('dataBall', ball => {
+                this.ball.ball.setX(ball.x)
+                this.ball.ball.setY(ball.y)
+                console.log(ball.x, ball.y)
+
+                // this.enemy.player.setX(data.x)
+                // this.enemy.player.setY(data.y)
             })
         }
 
@@ -118,14 +127,19 @@ export default class GameScene extends Phaser.Scene {
 
             }
         })
-
+        this.startGame()
 
     }
 
     update() {
+        if (this.client && !this.client.master) {
+            // console.log(this.player.ball.x)
+        } else {
+            // console.log('Sry, you are slave!')
+
+        }
         this.sync()
-        console.log(this.ball.ball.x, this.ball.ball.y)
-        console.log(this.player.player.x, this.player.player.y)
+
 
 
         if (this.lastPortal && this.lastPortal.gameObject) {
@@ -151,12 +165,16 @@ export default class GameScene extends Phaser.Scene {
     }
     sync() {
         if (this.client) {
+            let ball = null
+            if (this.client.master) {
+                ball = this.player.ball
+            }
             this.client.send({
                 x: this.player.player.x,
                 y: this.player.player.y,
                 // xB: this.ball.ball.x,
                 // yB: this.ball.ball.y,
-            })
+            }, ball)
         }
     }
     initLabels() {

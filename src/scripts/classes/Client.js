@@ -29,12 +29,21 @@ export default class Client extends Phaser.Events.EventEmitter {
     this.socket.on('enemyMove', data => {
       this.emit('data', data)
     })
+    this.socket.on('enemyBallMove', ball => {
+      this.emit('dataBall', ball)
+    })
   }
-  send(data) {
+  send(data, ball) {
     if (JSON.stringify(data) !== JSON.stringify(this.sent)) {
       this.sent = data
       this.socket.emit('playerMove', data)
     }
+    if (ball) {
+      // console.log('x : ', ball.x.toPrecision(2), 'y : ', ball.y.toPrecision(2))
+      this.socket.emit('ballMove', ball)
+
+    }
+
 
   }
 }
