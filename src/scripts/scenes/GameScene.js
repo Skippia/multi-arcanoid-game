@@ -60,6 +60,10 @@ export default class GameScene extends Phaser.Scene {
 
         if (this.client) {
             this.enemy = new Player(this, this.map, platform.enemy)
+            this.client.on('data', data => {
+                this.enemy.player.setX(data.x)
+                this.enemy.player.setY(data.y)
+            })
         }
 
         this.initLabels()
@@ -119,6 +123,10 @@ export default class GameScene extends Phaser.Scene {
     }
 
     update() {
+        this.sync()
+        console.log(this.ball.ball.x, this.ball.ball.y)
+        console.log(this.player.player.x, this.player.player.y)
+
 
         if (this.lastPortal && this.lastPortal.gameObject) {
             this.angle += 9
@@ -140,6 +148,16 @@ export default class GameScene extends Phaser.Scene {
         this.player.move()
         this.ball.move()
 
+    }
+    sync() {
+        if (this.client) {
+            this.client.send({
+                x: this.player.player.x,
+                y: this.player.player.y,
+                // xB: this.ball.ball.x,
+                // yB: this.ball.ball.y,
+            })
+        }
     }
     initLabels() {
         this.lifesText = this.add.text(15, 15, `Lifes: ${this.playerLife}`, { fontSize: '46px', fill: '#000' })

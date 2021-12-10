@@ -24,6 +24,8 @@ export default class Player {
         this.player.setFixedRotation()
         this.player.setAngle(0)
 
+        this.ball = this.scene.ball ///&&!!!!
+
     }
     get directions() {
         let directionH = this.DIRECTIONS_HORIZONTAL.NONE
