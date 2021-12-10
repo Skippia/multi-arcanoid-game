@@ -1,4 +1,4 @@
-const HOST = 'http://localhost:3000'
+const HOST = 'https://ancient-headland-38831.herokuapp.com/'
 
 import Phaser from 'phaser'
 import io from "socket.io/client-dist/socket.io"
