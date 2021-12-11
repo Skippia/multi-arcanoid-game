@@ -20,8 +20,9 @@ export default class Map {
             const sprite = this.scene.matter.add.sprite(collision.x + collision.width / 2, collision.y - collision.height / 2, 'objects', collision.name)
             // sprite.setOrigin(0, 1)
             sprite.setStatic(true)
-            sprite.setBounce(0.95)
-            sprite.setFriction(0)
+            sprite.setIgnoreGravity(true)
+            sprite.setBounce(0.9)
+            sprite.setFriction(0, 0, 0)
         })
     }
     // Создаем области пересечения для отслеживания условия проигрыша игроков

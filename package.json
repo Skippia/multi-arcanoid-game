@@ -9,8 +9,9 @@
   },
   "scripts": {
     "build": "webpack --config webpack/prod.js ",
+    "build:dev": "webpack --config webpack/base.js ",
     "start": "node server.server.js",
-    "dev": "nodemon server/server.js"
+    "server": "nodemon server/server.js"
   },
   "repository": {
     "type": "git",

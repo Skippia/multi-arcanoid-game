@@ -3,22 +3,40 @@ import config from '../../index'
 export default class Ball {
   constructor(scene, map) {
     this.DIRECTIONS_HORIZONTAL = Object.freeze({ BACKWARD: -1, NONE: 0, FORWARD: 1 })
-    this.SPEED_HORIZONTAL = 10
+    this.SPEED_HORIZONTAL = 15
     this.DIRECTIONS_VERTICAL = Object.freeze({ BACKWARD: -1, NONE: 0, FORWARD: 1 })
-    this.SPEED_VERTICAL = 10
+    this.SPEED_VERTICAL = 15
     this.scene = scene
     this.map = map
 
     this.ball = this.scene.matter.add.sprite(config.width / 2, config.height / 2, 'objects', 'ball')
+
     this.ball.setIgnoreGravity(true)
     this.ball.setBounce(1)
     this.ball.setFriction(0, 0, 0)
-    // this.ball.setVelocity(0, 0)
     // this.ball.setFixedRotation()
     // this.ball.setAngle(0)
-    // this.ball.setFrictionAir(0)
+
   }
   created() {
+
+  }
+  adjuctSpeedBall() {
+    const { x, y } = this.ball.body.velocity
+    let signX = x / Math.abs(x)
+    let signY = y / Math.abs(y)
+
+    if (Math.abs(x) >= this.SPEED_HORIZONTAL) {
+      this.ball.setVelocityX(this.SPEED_HORIZONTAL * signX)
+    } else if (Math.abs(x) <= this.SPEED_HORIZONTAL / 2) {
+      this.ball.setVelocityX(this.SPEED_HORIZONTAL / 2 * signX)
+    }
+
+    if (Math.abs(y) >= this.SPEED_VERTICAL) {
+      this.ball.setVelocityY(this.SPEED_VERTICAL * signY)
+    } else if (Math.abs(y) <= this.SPEED_VERTICAL / 2) {
+      this.ball.setVelocityY(this.SPEED_VERTICAL / 2 * signY)
+    }
 
   }
   move() {

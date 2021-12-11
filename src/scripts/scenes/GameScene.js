@@ -81,6 +81,12 @@ export default class GameScene extends Phaser.Scene {
 
 
         this.matter.world.on('collisionstart', (event, bodyA, bodyB) => {
+            if (bodyB.gameObject && bodyB.gameObject.frame && bodyB.gameObject.frame.texture && bodyB.gameObject.frame.texture.firstFrame == 'ball'
+                &&
+                bodyA.gameObject && bodyA.gameObject.frame && bodyA.gameObject.frame.name == 'ball') {
+                console.log('Столкновение!')
+            }
+
 
 
             if (bodyB.gameObject && bodyB.gameObject.frame && bodyB.gameObject.frame.texture && bodyB.gameObject.frame.texture.firstFrame == 'ball'
@@ -98,14 +104,14 @@ export default class GameScene extends Phaser.Scene {
 
                         this.departurePortal = potentialPortal
                         this.arrivalPortal = opposePortal
-                        console.log('FROM: ', this.departurePortal)
-                        console.log('TO: ', this.arrivalPortal)
+                        // console.log('FROM: ', this.departurePortal)
+                        // console.log('TO: ', this.arrivalPortal)
 
                         let fromP = this.map.getPortalPosition(this.departurePortal)
                         let toP = this.map.getPortalPosition(this.arrivalPortal = opposePortal)
 
-                        console.log('FROM x,y : ', fromP.x, fromP.y)
-                        console.log('TO x,y : ', toP.x, toP.y)
+                        // console.log('FROM x,y : ', fromP.x, fromP.y)
+                        // console.log('TO x,y : ', toP.x, toP.y)
 
                         this.ball.ball.setVisible(false)
 
@@ -132,6 +138,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     update() {
+        this.ball.adjuctSpeedBall()
         if (this.client && !this.client.master) {
             // console.log(this.player.ball.x)
         } else {
@@ -213,8 +220,8 @@ export default class GameScene extends Phaser.Scene {
     startGame() {
         // Задаем рандомную скорость и направление полета мяча из стартовой позции в центре экрана
         let randomSpectrum = [-1, 1]
-        let speedX = randomSpectrum[Math.round(Math.random())] * (2 + Math.random() * this.ball.SPEED_HORIZONTAL)
-        let speedY = randomSpectrum[Math.round(Math.random())] * (2 + Math.random() * this.ball.SPEED_VERTICAL)
+        let speedX = randomSpectrum[Math.round(Math.random())] * (5 + Math.random() * this.ball.SPEED_HORIZONTAL)
+        let speedY = randomSpectrum[Math.round(Math.random())] * (5 + Math.random() * this.ball.SPEED_VERTICAL)
         this.ball.ball.setVelocity(speedX, speedY)
         // Скрываем надпись "Click to play!"
         this.mainText.setVisible(false)
