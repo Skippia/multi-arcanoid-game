@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/photonstorm/phaser3-project-template#readme",
   "devDependencies": {
+    "@azerion/phaser-input": "^2.0.5",
     "@babel/core": "^7.2.2",
     "@babel/preset-env": "^7.2.3",
     "babel-loader": "^8.0.5",
@@ -43,6 +44,7 @@
     "express": "^4.17.1",
     "nodemon": "^2.0.15",
     "phaser": "^3.16.2",
+    "phaser3-rex-plugins": "^1.1.64",
     "socket.io": "^4.4.0"
   }
 }

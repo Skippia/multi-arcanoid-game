@@ -18,7 +18,6 @@ export default class Map {
     createCollision() {
         this.tilemap.findObject('collisions', collision => {
             const sprite = this.scene.matter.add.sprite(collision.x + collision.width / 2, collision.y - collision.height / 2, 'objects', collision.name)
-            // sprite.setOrigin(0, 1)
             sprite.setStatic(true)
             sprite.setIgnoreGravity(true)
             sprite.setBounce(0.9)
@@ -30,7 +29,7 @@ export default class Map {
         this.checkpoints = []
         this.tilemap.findObject('checkpoints', checkpoint => {
             let rectangle = new Phaser.Geom.Rectangle(checkpoint.x, checkpoint.y, checkpoint.width, checkpoint.height)
-            rectangle.index = checkpoint.properties.find(property => property.name === 'value').value
+            rectangle.index = checkpoint.properties.find(property => property.name === 'value').position
             this.checkpoints.push(rectangle)
         })
     }
@@ -39,19 +38,12 @@ export default class Map {
             let portal = this.scene.matter.add.sprite(portalSprite.x + portalSprite.width / 2,
                 portalSprite.y - portalSprite.height / 2,
                 'objects', portalSprite.name)
-            // portal.setOrigin(0, 1)
             portal.setStatic(true)
             portal.setSensor(true)
 
         })
     }
-    /*  createOverlaps() {
-         this.tilemap.findObject('overlaps', collision => {
-             const sprite = this.scene.matter.add.sprite(collision.x + collision.width / 2, collision.y - collision.height / 2, 'objects', collision.name)
-             // sprite.setOrigin(0, 1)
-             // sprite.setStatic(true)
-         })
-     } */
+
     getPlayerPosition(positionName) {
         return this.tilemap.findObject(positionName, position => {
             return position.name === positionName

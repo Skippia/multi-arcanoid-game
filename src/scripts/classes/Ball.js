@@ -14,8 +14,6 @@ export default class Ball {
     this.ball.setIgnoreGravity(true)
     this.ball.setBounce(1)
     this.ball.setFriction(0, 0, 0)
-    // this.ball.setFixedRotation()
-    // this.ball.setAngle(0)
 
   }
   created() {
@@ -44,6 +42,7 @@ export default class Ball {
   }
   checkPosition() {
     const checkpoint = this.map.getCheckpoint(this.ball)
+
     if (checkpoint) {
       this.onCheckpoint(checkpoint)
     }
@@ -51,7 +50,6 @@ export default class Ball {
   onCheckpoint(checkpoint) {
     // Если мяч пересек нижнюю границу - значит игрок проиграл
     if (checkpoint == 'bottom') {
-
       // Если это не последняя жизнь, то просто начинаем попытку заново
       if (this.scene.playerLife > 0) {
         // Фиксируем мяч в пространстве
@@ -60,12 +58,16 @@ export default class Ball {
         this.ball.setVelocity(0, 0)
         // Уменьшаем кол-во ХП игрока и перерисовываем надпись
         this.scene.playerLife--
-        this.scene.lifesText.setText(`Lifes : ${this.scene.playerLife}`)
+        this.scene.isCountdownComplete = false
+
+        // this.scene.lifesText.setText(`Lifes : ${this.scene.playerLife}`)
         // Переходим в режим подготовки к бою
         this.scene.gameState = this.scene.GAMES_STATES['PREPARATION']
-        this.scene.gameIsProcessing = false
+        this.scene.HP_ARRAY.pop().destroy()
+
+        this.scene.startCountdown()
         // Показываем надпись
-        this.scene.mainText.setVisible(true)
+        // this.scene.mainText.setVisible(true)
       } else {
         console.log('Game over!')
         // Инициируем события рестарта, которое будет прослушивать GameScene

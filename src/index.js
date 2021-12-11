@@ -3,13 +3,14 @@ import BootScene from './scripts/scenes/BootScene'
 import PreloadScene from './scripts/scenes/PreloadScene'
 import StartScene from "./scripts/scenes/StartScene"
 import GameScene from './scripts/scenes/GameScene'
+import NickScene from './scripts/scenes/NickScene'
 import FinishScene from "./scripts/scenes/FinishScene"
 
 const config = {
     type: Phaser.AUTO,
     width: 2175,
     height: 1024,
-    scene: [BootScene, PreloadScene, StartScene, GameScene, FinishScene],
+    scene: [BootScene, PreloadScene, StartScene, NickScene, GameScene, FinishScene],
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
@@ -17,11 +18,13 @@ const config = {
     physics: {
         default: 'matter',
         matter: {
-            debug: false,
+            debug: true,
             gravity: { x: 0, y: 0 }
         }
     }
 }
 
 const game = new Phaser.Game(config)
+
+
 export default config

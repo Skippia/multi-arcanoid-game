@@ -18,6 +18,7 @@ const server = http.createServer(app)
 const documentRoot = path.join(__dirname, DOCROOT)
 const staticContent = express.static(documentRoot)
 app.use(staticContent)
+app.use(express.static('public'))
 
 // 4. инициализируем сокеты
 sockets.init(server)

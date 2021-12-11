@@ -27,22 +27,26 @@ export default class StartScene extends Phaser.Scene {
 
     this.button1.on('pointerdown', this.startGame, this)
     this.button2.on('pointerdown', this.requestGame, this)
+    this.button3.on('pointerdown', this.changeNick, this)
   }
   createButtons() {
-    this.button1 = this.add.sprite(config.width / 2, config.height / 2 - 150, 'btnSingle').setOrigin(0, 0) // ???
+    this.button1 = this.add.sprite(config.width / 2, config.height / 3 - 150 + 50, 'btnSingle').setOrigin(0, 0) // ???
       .setOrigin(0.5)
       .setInteractive()
 
-    this.button2 = this.add.sprite(config.width / 2, config.height / 2 + 150, 'btnTwo').setOrigin(0, 0) // ???
+    this.button2 = this.add.sprite(config.width / 2, config.height * 2 / 3 - 150, 'btnTwo').setOrigin(0, 0) // ???
+      .setOrigin(0.5)
+      .setInteractive()
+
+    this.button3 = this.add.sprite(config.width / 2, config.height * 3 / 3 - 150 - 50, 'btnChangeNick').setOrigin(0, 0) // ???
       .setOrigin(0.5)
       .setInteractive()
 
   }
   startGame() {
-    this.scene.start('Game', {client: this.client})
+    this.scene.start('Game', { client: this.client })
   }
   requestGame() {
-
     // инициализировать клиент
     this.client = new Client()
     // // отправить запрос игры на сервер
@@ -50,5 +54,8 @@ export default class StartScene extends Phaser.Scene {
     // // по факту получения противника
     this.client.on('game', this.startGame, this)
     // начать игру
+  }
+  changeNick() {
+    this.scene.start('Nick')
   }
 }
