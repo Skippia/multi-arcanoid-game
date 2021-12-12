@@ -3,18 +3,16 @@ import { mode } from '../scenes/StartScene'
 
 export default class Ball {
   constructor(scene, map) {
+    this.scene = scene
+    this.map = map
+    this.playerCheckpointFirstEntrance = true
+    this.enemyCheckpointFirstEntrance = true
     this.DIRECTIONS_HORIZONTAL = Object.freeze({ BACKWARD: -1, NONE: 0, FORWARD: 1 })
     this.SPEED_HORIZONTAL = 15
     this.DIRECTIONS_VERTICAL = Object.freeze({ BACKWARD: -1, NONE: 0, FORWARD: 1 })
     this.SPEED_VERTICAL = 15
-    this.scene = scene
-    this.map = map
-
-    this.playerCheckpointFirstEntrance = true
-    this.enemyCheckpointFirstEntrance = true
 
     this.ball = this.scene.matter.add.sprite(config.width / 2, config.height / 2, 'objects', 'ball')
-
     this.ball.setIgnoreGravity(true)
     this.ball.setBounce(1)
     this.ball.setFriction(0, 0, 0)

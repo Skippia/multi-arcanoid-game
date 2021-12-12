@@ -5,18 +5,16 @@ export default class Player {
     constructor(scene, map, config) {
         this.scene = scene
         this.map = map
-        const position = this.map.getPlayerPosition(config.position)
-        console.log('Create platform: ', config)
-        console.log('Create platform position: ', position)
-
-        this.player = this.scene.matter.add.sprite(position.x, position.y, 'objects', config.sprite)
-
-        this.map.getPortalPosition()
-
         this.DIRECTIONS_HORIZONTAL = Object.freeze({ BACKWARD: -1, NONE: 0, FORWARD: 1 })
         this.SPEED_HORIZONTAL = 20
         this.DIRECTIONS_VERTICAL = Object.freeze({ BACKWARD: -1, NONE: 0, FORWARD: 1 })
         this.SPEED_VERTICAL = 10
+
+        // Получаем положение платформы
+        const position = this.map.getPlayerPosition(config.position)
+        this.player = this.scene.matter.add.sprite(position.x, position.y, 'objects', config.sprite)
+
+        // this.map.getPortalPosition()
 
         this.player.setBounce(1)
         this.player.setFriction(0)
@@ -25,13 +23,14 @@ export default class Player {
         this.player.setFixedRotation()
         this.player.setAngle(0)
 
-        this.ball = this.scene.ball ///&&!!!!
+        this.ball = this.scene.ball
 
     }
     create() {
 
     }
     get direction() {
+        // Когда мы ничего не нажимаем скорость = 0
         let directionH = this.DIRECTIONS_HORIZONTAL.NONE
 
         // Move platform via touch click

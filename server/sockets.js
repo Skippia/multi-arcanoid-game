@@ -17,15 +17,16 @@ module.exports = {
             socket.on('enemyHP', enemyHP => {
                 this.onEnemyHP(socket, enemyHP)
             })
-            socket.on('end', () => {
-                // socket.disonnect()
-                this.sessions = []
-                console.log('clear sessions')
-                console.log(this.sessions)
+            /*    socket.on('end', () => {
+                   // socket.disonnect()
+                   this.sessions = []
+                   console.log('clear sessions')
+                   console.log(this.sessions)
 
-                // console.log('Server socket disconnect!!')
+                   // console.log('Server socket disconnect!!')
 
-            })
+               }) */
+            // Когда к серверу подключается клиент - устанавливается сокетное взаимодействие
             this.onConnection(socket)
         })
     },
@@ -109,11 +110,15 @@ module.exports = {
 
     },
     startGame(session) {
+        // Тут мы иницириуем событие начала игры, которое прослушивается в клиенте
+        //(сокет клиента инициирует событие)
+        // <==> socket.emit('gameStart')
         session.playerSocket.emit('gameStart', { master: true })
         session.enemySocket.emit('gameStart')
     },
     onConnection(socket) {
         console.log(`new user connected ${socket.id}`)
+
         // получить текущую ожидающую игровую сессию
         let session = this.getPendingSession()
 

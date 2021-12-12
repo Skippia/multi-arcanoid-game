@@ -11,9 +11,13 @@ export default class Client extends Phaser.Events.EventEmitter {
 
   init() {
     this.sent = {}
+    // По умолчанию клиент - slave
     this.master = false
+
     // Creating client-socket --> Auto emit event 'connect' to server
     this.socket = io(HOST)
+
+    // Group socket on events
     this.socket.on('connect', () => {
       console.log('client connected')
     })
@@ -39,10 +43,11 @@ export default class Client extends Phaser.Events.EventEmitter {
     this.socket.on('enemyHP', enemyHP => {
       this.emit('enemyHP', enemyHP)
     })
-
+    // End group socket on events
   }
   send(data, ball) {
-    if (JSON.stringify(data) !== JSON.stringify(this.sent)) {
+    // Отправляем новое положение мяча только если оно отличается от старого
+    if (JSON.stringify(data) !== JSON.stringify(this.sent) && mode.type == 'multi') {
       this.sent = data
       this.socket.emit('playerMove', data)
     }
@@ -60,7 +65,7 @@ export default class Client extends Phaser.Events.EventEmitter {
       this.socket.emit('enemyHP', playerHP)
     }
   }
-  closeServerSocket() {
-    this.socket.emit('end')
-  }
+  /*   closeServerSocket() {
+      this.socket.emit('end')
+    } */
 }
