@@ -3,14 +3,14 @@ import BootScene from './scripts/scenes/BootScene'
 import PreloadScene from './scripts/scenes/PreloadScene'
 import StartScene from "./scripts/scenes/StartScene"
 import GameScene from './scripts/scenes/GameScene'
-import NickScene from './scripts/scenes/NickScene'
-import FinishScene from "./scripts/scenes/FinishScene"
+import WinFinishScene from "./scripts/scenes/WinFinishScene"
+import LostFinishScene from "./scripts/scenes/LostFinishScene"
 
 const config = {
     type: Phaser.AUTO,
     width: 2175,
     height: 1024,
-    scene: [BootScene, PreloadScene, StartScene, NickScene, GameScene, FinishScene],
+    scene: [BootScene, PreloadScene, StartScene, GameScene, LostFinishScene, WinFinishScene],
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH

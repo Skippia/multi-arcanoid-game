@@ -1,18 +1,17 @@
 import config from '../../index'
 
-export default class FinishScene extends Phaser.Scene {
+export default class LostFinishScene extends Phaser.Scene {
   constructor() {
-    super('Finish')
+    super('LostFinish')
   }
   create() {
-    // console.log('FinishScene.create')
     this.createBackgroundFinish()
     this.createText()
     this.setEvents()
   }
 
   createBackgroundFinish() {
-    this.add.sprite(0, 0, 'bgFinish').setOrigin(0, -0.1) // ???
+    this.add.sprite(0, 0, 'bgFinishLost').setOrigin(0, -0.1) // ???
   }
   createText() {
     this.add.text(config.width / 2, config.height / 4, `Click to restart!`,

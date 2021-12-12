@@ -86,25 +86,30 @@ export default class GameScene extends Phaser.Scene {
             })
 
             this.client.on('playerHP', playerHP => {
+                // Если игра еще не была перезапущена, то начинаем ее перезапуск и выключаем этот флаг
                 this.playerHP = playerHP
                 console.log('New playerHP: ', this.playerHP)
                 if (this.playerHP >= 0) {
                     this.reloadSublevelPlayerHelp()
                 } else {
                     // Игрок проиграл (рестарт для slave)
-                    this.globalRestart('playerLost(info for slave)')
+                    this.globalRestart('playerLost')
                 }
             })
             this.client.on('enemyHP', enemyHP => {
+
                 this.enemyHP = enemyHP
                 console.log('New enemyHP: ', this.enemyHP)
                 if (this.enemyHP >= 0) {
                     this.reloadSublevelEnemyHelp()
                 } else {
                     // Враг проиграл (рестарт для slave)
-                    this.globalRestart('enemyLost(info for slave)')
+                    // Начинаем перезапуск игры
+                    this.globalRestart('enemyLost')
                 }
+
             })
+
         }
 
         this.initLabels()
@@ -169,10 +174,14 @@ export default class GameScene extends Phaser.Scene {
 
         if (this.client && !this.client.master && !this.sceneRotated) {
             this.sceneRotated = true
-            // cam.rotation = Math.PI
+            cam.rotation = Math.PI
             this.hpPlayer1.setAngle(180)
             this.hpPlayer2.setAngle(180)
             this.hpPlayer3.setAngle(180)
+
+            this.hpEnemy1.setAngle(180)
+            this.hpEnemy2.setAngle(180)
+            this.hpEnemy3.setAngle(180)
         }
 
 
@@ -311,24 +320,24 @@ export default class GameScene extends Phaser.Scene {
         if (this.client && !this.client.master && !this.sceneRotated) {
             // Slave
             // Player hp
-            this.hpPlayer1 = this.add.sprite(config.width - 15, config.height - 35, 'HP').setOrigin(0, 0)
-            this.hpPlayer2 = this.add.sprite(config.width - 65, config.height - 35, 'HP').setOrigin(0, 0)
-            this.hpPlayer3 = this.add.sprite(config.width - 115, config.height - 35, 'HP').setOrigin(0, 0)
+            this.hpPlayer1 = this.add.sprite(config.width - 15, config.height - 100, 'HP').setOrigin(0)
+            this.hpPlayer2 = this.add.sprite(config.width - 65, config.height - 100, 'HP').setOrigin(0)
+            this.hpPlayer3 = this.add.sprite(config.width - 115, config.height - 100, 'HP').setOrigin(0)
             // Enemy hp
-            this.hpEnemy1 = this.add.sprite(15, config.height - 35, 'HP').setOrigin(0, 0)
-            this.hpEnemy2 = this.add.sprite(65, config.height - 35, 'HP').setOrigin(0, 0)
-            this.hpEnemy3 = this.add.sprite(115, config.height - 35, 'HP').setOrigin(0, 0)
+            this.hpEnemy1 = this.add.sprite(config.width - 15, config.height - 35, 'HPEnemy').setOrigin(0)
+            this.hpEnemy2 = this.add.sprite(config.width - 65, config.height - 35, 'HPEnemy').setOrigin(0)
+            this.hpEnemy3 = this.add.sprite(config.width - 115, config.height - 35, 'HPEnemy').setOrigin(0)
         }
         else {
             // Master
             // Player hp
-            this.hpPlayer1 = this.add.sprite(15, 35, 'HP').setOrigin(0, 0)
-            this.hpPlayer2 = this.add.sprite(65, 35, 'HP').setOrigin(0, 0)
-            this.hpPlayer3 = this.add.sprite(115, 35, 'HP').setOrigin(0, 0)
+            this.hpPlayer1 = this.add.sprite(15, 100, 'HP').setOrigin(0)
+            this.hpPlayer2 = this.add.sprite(65, 100, 'HP').setOrigin(0)
+            this.hpPlayer3 = this.add.sprite(115, 100, 'HP').setOrigin(0)
             // Enemy hp
-            this.hpEnemy1 = this.add.sprite(config.width - 15, 35, 'HP').setOrigin(0, 0)
-            this.hpEnemy2 = this.add.sprite(config.width - 65, 35, 'HP').setOrigin(0, 0)
-            this.hpEnemy3 = this.add.sprite(config.width - 115, 35, 'HP').setOrigin(0, 0)
+            this.hpEnemy1 = this.add.sprite(15, 35, 'HPEnemy').setOrigin(0)
+            this.hpEnemy2 = this.add.sprite(65, 35, 'HPEnemy').setOrigin(0)
+            this.hpEnemy3 = this.add.sprite(115, 35, 'HPEnemy').setOrigin(0)
         }
         this.PLAYER_HP_ARRAY.push(this.hpPlayer1, this.hpPlayer2, this.hpPlayer3)
         this.ENEMY_HP_ARRAY.push(this.hpEnemy1, this.hpEnemy2, this.hpEnemy3)
@@ -337,12 +346,21 @@ export default class GameScene extends Phaser.Scene {
     startCountdown() {
         this.gameIsProcessing = false
         let time3 = this.add.sprite(config.width / 2, config.height / 2, 'time3')
+        if (this.client && !this.client.master) {
+            time3.setAngle(180)
+        }
         setTimeout(() => {
             time3.destroy()
             let time2 = this.add.sprite(config.width / 2, config.height / 2, 'time2')
+            if (this.client && !this.client.master) {
+                time2.setAngle(180)
+            }
             setTimeout(() => {
                 time2.destroy()
                 let time1 = this.add.sprite(config.width / 2, config.height / 2, 'time1')
+                if (this.client && !this.client.master) {
+                    time1.setAngle(180)
+                }
                 setTimeout(() => {
                     time1.destroy()
                     this.isCountdownComplete = true
@@ -379,10 +397,17 @@ export default class GameScene extends Phaser.Scene {
         this.gameIsProcessing = true
     }
 
-    onRestart() {
+    onRestart(conditionGame) {
         console.log('GO to finish')
+
         // this.client.socket.emit('end')
-        this.scene.start('Finish')
+
+        // Игра была успешно перезапущена, поэтому теперь ее вновь можно будет перезапустить в будущем
+        if (conditionGame == 'win') {
+            this.scene.start('WinFinish')
+        } else if (conditionGame == 'lost') {
+            this.scene.start('LostFinish')
+        }
 
     }
     findOpposePortal(name) {
@@ -402,12 +427,35 @@ export default class GameScene extends Phaser.Scene {
     }
     globalRestart(looser) {
         console.log('In this game is looser : ', looser)
+        let config = null
+        let configScreen = [{ 'master': 'win', 'slave': 'lost' }, { 'master': 'lost', 'slave': 'win' }]
 
-        this.events.emit('restart')
+        if (looser == 'playerLost' && this.client && this.client.master) {
+            // Это хост и он проиграл
+            console.log('You (host) has lost!')
+            this.events.emit('restart', 'lost')
+        } else if (looser == 'playerLost' && this.client && !this.client.master) {
+            // Это slave и он выиграл
+            console.log('You (slave) has win!')
+            this.events.emit('restart', 'win')
+        } else if (looser == 'enemyLost' && this.client && this.client.master) {
+            // Это хост и он выиграл
+            console.log('You (host) has win!')
+            this.events.emit('restart', 'win')
+        } else if (looser == 'enemyLost' && this.client && !this.client.master) {
+            // Это slave  и он проиграл
+            console.log('You (slave) has lost!')
+            this.events.emit('restart', 'lost')
+        }
+
+
+
+
         // Сбрасываем показатели жизни до исходных и останавливаем игровой процесс
         this.playerHP = 3
         this.enemyHP = 3
         this.gameIsProcessing = false
+
     }
 
 }

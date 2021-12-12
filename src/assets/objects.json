@@ -17,24 +17,24 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "enemy",
-	"frame": {"x":1,"y":706,"w":192,"h":80},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":192,"h":80},
-	"sourceSize": {"w":192,"h":80}
-},
-{
-	"filename": "full-hp",
-	"frame": {"x":131,"y":1,"w":64,"h":64},
+	"filename": "enemy-hp",
+	"frame": {"x":1,"y":66,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
 	"sourceSize": {"w":64,"h":64}
 },
 {
+	"filename": "enemy",
+	"frame": {"x":1,"y":771,"w":192,"h":80},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":192,"h":80},
+	"sourceSize": {"w":192,"h":80}
+},
+{
 	"filename": "player",
-	"frame": {"x":1,"y":787,"w":192,"h":80},
+	"frame": {"x":1,"y":852,"w":192,"h":80},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":192,"h":80},
@@ -42,7 +42,7 @@
 },
 {
 	"filename": "portal2-end",
-	"frame": {"x":1,"y":66,"w":160,"h":159},
+	"frame": {"x":1,"y":131,"w":160,"h":159},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":160,"h":159},
@@ -50,7 +50,7 @@
 },
 {
 	"filename": "portal2-start",
-	"frame": {"x":1,"y":226,"w":160,"h":159},
+	"frame": {"x":1,"y":291,"w":160,"h":159},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":160,"h":159},
@@ -58,7 +58,7 @@
 },
 {
 	"filename": "portal3-end",
-	"frame": {"x":1,"y":386,"w":160,"h":159},
+	"frame": {"x":1,"y":451,"w":160,"h":159},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":160,"h":159},
@@ -66,19 +66,27 @@
 },
 {
 	"filename": "portal3-start",
-	"frame": {"x":1,"y":546,"w":160,"h":159},
+	"frame": {"x":1,"y":611,"w":160,"h":159},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":160,"h":159},
 	"sourceSize": {"w":160,"h":159}
+},
+{
+	"filename": "your-hp",
+	"frame": {"x":66,"y":66,"w":64,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
+	"sourceSize": {"w":64,"h":64}
 }],
 "meta": {
 	"app": "https://www.codeandweb.com/texturepacker",
 	"version": "1.0",
 	"image": "objects.png",
 	"format": "RGBA8888",
-	"size": {"w":196,"h":868},
+	"size": {"w":194,"h":933},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:71080233c98aa518bd56fd5bcd3f2bae:581f5db6a1d8e6ee89e37030af7606b2:8d6d12ff4d5234f2a4b19e0a906dbf52$"
+	"smartupdate": "$TexturePacker:SmartUpdate:a5951e5f95125001a862cb1079571684:9004e782d715d97e3b1360449824e4a0:8d6d12ff4d5234f2a4b19e0a906dbf52$"
 }
 }
