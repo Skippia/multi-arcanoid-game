@@ -37,6 +37,7 @@ export default class Map {
             }
         })
     }
+    // Создаем порталы
     createPortals() {
         this.tilemap.findObject('overlaps', portalSprite => {
             let portal = this.scene.matter.add.sprite(portalSprite.x + portalSprite.width / 2,
@@ -48,22 +49,18 @@ export default class Map {
         })
     }
 
+    // Получаем положение игрока по его имени
     getPlayerPosition(positionName) {
         return this.tilemap.findObject(positionName, position => {
             return position.name === positionName
         })
     }
+    // Получаем положение портала по его имени
     getPortalPosition(name) {
         return this.tilemap.findObject('overlaps', position => {
             return position.name === name
         })
     }
-    getPortals() {
-        return this.tilemap.findObject('overlaps', position => {
-            return position
-        })
-    }
-
 
     getCheckpoint(ball) {
         // Проверяем пересекает ли мяч один из наших чекпоинтов

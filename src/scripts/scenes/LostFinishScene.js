@@ -11,7 +11,7 @@ export default class LostFinishScene extends Phaser.Scene {
   }
 
   createBackgroundFinish() {
-    this.add.sprite(0, 0, 'bgFinishLost').setOrigin(0, -0.1) // ???
+    this.add.sprite(0, 0, 'bgFinishLost').setOrigin(0, -0.1)
   }
   createText() {
     this.add.text(config.width / 2, config.height / 4, `Click to restart!`,

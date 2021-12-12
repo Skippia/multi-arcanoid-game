@@ -4,6 +4,7 @@ import Map from '../classes/Map'
 import Player from "../classes/Player"
 import Ball from "../classes/Ball"
 import { mode } from './StartScene'
+import Util from '../classes/Utils'
 
 const PLATFORMS = {
     PLAYER_PLATFORM: {
@@ -19,7 +20,6 @@ const PLATFORMS = {
 export default class GameScene extends Phaser.Scene {
     constructor() {
         super('Game')
-
         this.GAMES_STATES = { 'PREPARATION': 'PREPARATION', 'START': 'START', 'TRY': 'TRY', 'FINISH': 'FINISH' }
     }
     init(data) {
