@@ -29,8 +29,12 @@ export default class Map {
         this.checkpoints = []
         this.tilemap.findObject('checkpoints', checkpoint => {
             let rectangle = new Phaser.Geom.Rectangle(checkpoint.x, checkpoint.y, checkpoint.width, checkpoint.height)
-            rectangle.index = checkpoint.properties.find(property => property.name === 'value').position
-            this.checkpoints.push(rectangle)
+            if (checkpoint.properties.find(property => property.name === 'value')
+                &&
+                checkpoint.properties.find(property => property.name === 'value').position) {
+                rectangle.index = checkpoint.properties.find(property => property.name === 'value').position
+                this.checkpoints.push(rectangle)
+            }
         })
     }
     createPortals() {

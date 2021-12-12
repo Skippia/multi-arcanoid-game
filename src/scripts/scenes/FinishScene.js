@@ -5,7 +5,7 @@ export default class FinishScene extends Phaser.Scene {
     super('Finish')
   }
   create() {
-    console.log('FinishScene.create')
+    // console.log('FinishScene.create')
     this.createBackgroundFinish()
     this.createText()
     this.setEvents()
@@ -20,7 +20,7 @@ export default class FinishScene extends Phaser.Scene {
   }
   setEvents() {
     this.input.on('pointerdown', () => {
-      this.scene.start('Game')
+      this.scene.start('Preload')
     })
   }
 }

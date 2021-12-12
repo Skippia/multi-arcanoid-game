@@ -32,6 +32,10 @@ export default class Client extends Phaser.Events.EventEmitter {
     this.socket.on('enemyBallMove', ball => {
       this.emit('dataBall', ball)
     })
+    this.socket.on('playerHP', playerHP => {
+      this.emit('playerHP', playerHP)
+    })
+
   }
   send(data, ball) {
     if (JSON.stringify(data) !== JSON.stringify(this.sent)) {
@@ -40,9 +44,9 @@ export default class Client extends Phaser.Events.EventEmitter {
     }
     if (ball) {
       this.socket.emit('ballMove', ball)
-
     }
-
-
+  }
+  sendPlayerHP(playerHP) {
+    this.socket.emit('playerHP', playerHP)
   }
 }

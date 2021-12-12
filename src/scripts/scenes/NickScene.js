@@ -9,7 +9,7 @@ export default class NickScene extends Phaser.Scene {
   }
 
   create() {
-    console.log('NickScene.create')
+    // console.log('NickScene.create')
     this.createBtnReturn()
 
 

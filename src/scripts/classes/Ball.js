@@ -9,6 +9,9 @@ export default class Ball {
     this.scene = scene
     this.map = map
 
+    this.playerCheckpointFirstEntrance = true
+    this.enemyCheckpointFirstEntrance = true
+
     this.ball = this.scene.matter.add.sprite(config.width / 2, config.height / 2, 'objects', 'ball')
 
     this.ball.setIgnoreGravity(true)
@@ -48,33 +51,66 @@ export default class Ball {
     }
   }
   onCheckpoint(checkpoint) {
+
     // Если мяч пересек нижнюю границу - значит игрок проиграл
-    if (checkpoint == 'bottom') {
+    if (checkpoint == 'bottom' && this.playerCheckpointFirstEntrance) {
+      this.playerCheckpointFirstEntrance = false
+
       // Если это не последняя жизнь, то просто начинаем попытку заново
-      if (this.scene.playerLife > 0) {
+      if (this.scene.playerHP > 0) {
+        console.log('BOTTOM LOSE')
+        this.scene.isBugBottom = false
         // Фиксируем мяч в пространстве
         this.ball.x = config.width / 2
         this.ball.y = config.height / 2
         this.ball.setVelocity(0, 0)
-        // Уменьшаем кол-во ХП игрока и перерисовываем надпись
-        this.scene.playerLife--
-        this.scene.isCountdownComplete = false
 
-        // this.scene.lifesText.setText(`Lifes : ${this.scene.playerLife}`)
-        // Переходим в режим подготовки к бою
-        this.scene.gameState = this.scene.GAMES_STATES['PREPARATION']
-        this.scene.HP_ARRAY.pop().destroy()
+        // Сбрасываем счетчик первого захода в зону проигрыша для игрока player
+        this.playerCheckpointFirstEntrance = true
+        // Сообщаем slave что игрок потерял жизнь
 
-        this.scene.startCountdown()
-        // Показываем надпись
-        // this.scene.mainText.setVisible(true)
+        console.log('call player lose')
+
+        this.scene.events.emit('playerLose')
+
       } else {
         console.log('Game over!')
+        // Сообщаем slave что игрок проиграл
+        this.scene.events.emit('playerLostSayToSlave')
+        this.playerCheckpointFirstEntrance = true
         // Инициируем события рестарта, которое будет прослушивать GameScene
-        this.ball.emit('restart', 'restart')
-        // Сбрасываем показатели жизни до исходных и останавливаем игровой процесс
-        this.scene.playerLife = 3
-        this.scene.gameIsProcessing = false
+        this.scene.globalRestart()
+      }
+    }
+
+    else if (checkpoint == 'top' && this.enemyCheckpointFirstEntrance && 1 < 0) {
+      this.enemyCheckpointFirstEntrance = false
+
+      // Если это не последняя жизнь, то просто начинаем попытку заново
+      if (this.scene.enemyHP > 0) {
+        console.log('TOP LOSE')
+        this.scene.isBugTop = false
+
+        // Фиксируем мяч в пространстве
+        this.ball.x = config.width / 2
+        this.ball.y = config.height / 2
+        this.ball.setVelocity(0, 0)
+
+        // Сбрасываем счетчик первого захода в зону проигрыша для игрока player
+        this.enemyCheckpointFirstEntrance = true
+        // Сообщаем slave что игрок потерял жизнь
+
+        console.log('call player lose')
+
+        this.scene.events.emit('enemyLose')
+
+      } else {
+        console.log('Game over!')
+        // Сообщаем slave что игрок проиграл
+        this.scene.events.emit('enemyLostSayToSlave')
+        this.enemyCheckpointFirstEntrance = true
+        // Инициируем события рестарта, которое будет прослушивать GameScene
+        this.scene.globalRestart()
       }
     }
 

@@ -25,6 +25,9 @@ export default class Player {
         this.ball = this.scene.ball ///&&!!!!
 
     }
+    create() {
+
+    }
     get directions() {
         let directionH = this.DIRECTIONS_HORIZONTAL.NONE
         let directionV = this.DIRECTIONS_VERTICAL.NONE

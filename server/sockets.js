@@ -11,6 +11,14 @@ module.exports = {
             socket.on('ballMove', ball => {
                 this.onBallMove(socket, ball)
             })
+            socket.on('playerHP', playerHP => {
+                this.onPlayerHP(socket, playerHP)
+            })
+            socket.on('end', () => {
+                socket.disonnect(0)
+                console.log('Socket disconnect!')
+
+            })
             this.onConnection(socket)
         })
     },
@@ -33,11 +41,12 @@ module.exports = {
     },
     onBallMove(socket, ball) {
 
+        // Ищем сессию , отправившиую запрос
         const session = this.sessions.find(session => session.playerSocket === socket || session.enemySocket === socket)
 
         if (session) {
             let opponentSocket = null
-
+            // Если наша сессия - сессия игрока, значит противоложная сессия - врага
             if (session.playerSocket === socket) {
                 opponentSocket = session.enemySocket
             } else {
@@ -45,6 +54,25 @@ module.exports = {
             }
             if (opponentSocket) {
                 opponentSocket.emit('enemyBallMove', ball)
+            }
+        }
+    },
+
+    onPlayerHP(socket, playerHP) {
+
+        // Ищем сессию , отправившиую запрос
+        const session = this.sessions.find(session => session.playerSocket === socket || session.enemySocket === socket)
+
+        if (session) {
+            let opponentSocket = null
+            // Если наша сессия - сессия игрока, значит противоложная сессия - врага
+            if (session.playerSocket === socket) {
+                opponentSocket = session.enemySocket
+            } else {
+                opponentSocket = session.playerSocket
+            }
+            if (opponentSocket) {
+                opponentSocket.emit('playerHP', playerHP)
             }
         }
     },
