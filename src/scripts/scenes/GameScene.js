@@ -6,27 +6,30 @@ import Ball from "../classes/Ball"
 import { mode } from './StartScene'
 import Util from '../classes/Utils'
 
-const PLATFORMS = {
-    PLAYER_PLATFORM: {
-        sprite: 'player',
-        position: 'player'
-    },
-    ENEMY_PLATFORM: {
-        sprite: 'enemy',
-        position: 'enemy'
-    }
-}
+
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
         super('Game')
         this.GAMES_STATES = { 'PREPARATION': 'PREPARATION', 'START': 'START', 'TRY': 'TRY', 'FINISH': 'FINISH' }
-    }
-    init(data) {
-
-        if (data.client) {
-            this.client = data.client
+        this.PLATFORMS = {
+            PLAYER_PLATFORM: {
+                sprite: 'player',
+                position: 'player'
+            },
+            ENEMY_PLATFORM: {
+                sprite: 'enemy',
+                position: 'enemy'
+            }
         }
+    }
+    // hook receive args from scene call
+    init(obj) {
+        // Если объект содержит клиента, значит мы сохраняем его в GameScene.client поле
+        if (obj.client) {
+            this.client = obj.client
+        }
+        // Инициализируем событие клавиш
         this.cursors = this.input.keyboard.createCursorKeys()
     }
     preload() {
@@ -34,8 +37,7 @@ export default class GameScene extends Phaser.Scene {
     }
     getPlatformsConfig() {
         // конфиг 1го игрока
-
-        let config = { player: PLATFORMS.PLAYER_PLATFORM, enemy: PLATFORMS.ENEMY_PLATFORM }
+        let config = { player: this.PLATFORMS.PLAYER_PLATFORM, enemy: this.PLATFORMS.ENEMY_PLATFORM }
 
         if (mode.type == 'single') {
             return config
@@ -43,7 +45,7 @@ export default class GameScene extends Phaser.Scene {
 
         if (this.client && !this.client.master) {
             // конфиг 2го игрока
-            config = { player: PLATFORMS.ENEMY_PLATFORM, enemy: PLATFORMS.PLAYER_PLATFORM }
+            config = { player: this.PLATFORMS.ENEMY_PLATFORM, enemy: this.PLATFORMS.PLAYER_PLATFORM }
         }
         return config
     }

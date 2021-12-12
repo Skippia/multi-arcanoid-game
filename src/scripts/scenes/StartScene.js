@@ -43,14 +43,15 @@ class StartScene extends Phaser.Scene {
   }
   startSingleGame() {
     mode.type = 'single'
-    this.client = undefined
-    this.scene.start('Game')
+    let obj = { client: undefined }
+    this.scene.start('Game', obj)
   }
-  startGame() {
+  startMultiGame() {
     mode.type = 'multi'
     console.log(this.client)
 
-    this.scene.start('Game', { client: this.client })
+    let obj = { client: this.client }
+    this.scene.start('Game', obj)
   }
   requestGame() {
     // инициализировать клиент
@@ -58,7 +59,7 @@ class StartScene extends Phaser.Scene {
     // отправить запрос игры на сервер
     this.client.init()
     //  по факту получения противника  начать игру
-    this.client.on('game', this.startGame, this)
+    this.client.on('game', this.startMultiGame, this)
   }
 }
 export { StartScene, mode }
