@@ -78,12 +78,11 @@ export default class Ball {
         // Сообщаем slave что игрок проиграл
         this.scene.events.emit('playerLostSayToSlave')
         this.playerCheckpointFirstEntrance = true
-        // Инициируем события рестарта, которое будет прослушивать GameScene
-        this.scene.globalRestart()
+        this.scene.globalRestart('playerLost')
       }
     }
 
-    else if (checkpoint == 'top' && this.enemyCheckpointFirstEntrance && 1 < 0) {
+    else if (checkpoint == 'top' && this.enemyCheckpointFirstEntrance) {
       this.enemyCheckpointFirstEntrance = false
 
       // Если это не последняя жизнь, то просто начинаем попытку заново
@@ -100,7 +99,7 @@ export default class Ball {
         this.enemyCheckpointFirstEntrance = true
         // Сообщаем slave что игрок потерял жизнь
 
-        console.log('call player lose')
+        console.log('call enemy lose')
 
         this.scene.events.emit('enemyLose')
 
@@ -110,7 +109,7 @@ export default class Ball {
         this.scene.events.emit('enemyLostSayToSlave')
         this.enemyCheckpointFirstEntrance = true
         // Инициируем события рестарта, которое будет прослушивать GameScene
-        this.scene.globalRestart()
+        this.scene.globalRestart('enemyLost')
       }
     }
 

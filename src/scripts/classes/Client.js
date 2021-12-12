@@ -35,6 +35,9 @@ export default class Client extends Phaser.Events.EventEmitter {
     this.socket.on('playerHP', playerHP => {
       this.emit('playerHP', playerHP)
     })
+    this.socket.on('enemyHP', enemyHP => {
+      this.emit('enemyHP', enemyHP)
+    })
 
   }
   send(data, ball) {
@@ -48,5 +51,8 @@ export default class Client extends Phaser.Events.EventEmitter {
   }
   sendPlayerHP(playerHP) {
     this.socket.emit('playerHP', playerHP)
+  }
+  sendEnemyHP(playerHP) {
+    this.socket.emit('enemyHP', playerHP)
   }
 }

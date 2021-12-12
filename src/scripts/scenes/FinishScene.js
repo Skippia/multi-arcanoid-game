@@ -20,7 +20,7 @@ export default class FinishScene extends Phaser.Scene {
   }
   setEvents() {
     this.input.on('pointerdown', () => {
-      this.scene.start('Preload')
+      this.scene.start('Start')
     })
   }
 }

@@ -19,22 +19,6 @@ export default class GameScene extends Phaser.Scene {
     constructor() {
         super('Game')
         this.GAMES_STATES = { 'PREPARATION': 'PREPARATION', 'START': 'START', 'TRY': 'TRY', 'FINISH': 'FINISH' }
-
-        /* // Game has not starting yet
-        this.gameIsProcessing = false
-        this.playerHP = 3
-
-        this.angle = 0
-        this.lastPortal = {}
-        this.LAST_POSITION = {}
-        this.timeStop = false
-        this.firstPassT = true
-        this.departurePortal = null
-        this.arrivalPortal = null
-        this.sceneRotated = false
-        this.HP_ARRAY = []
-        this.isCountdownComplete = false */
-
     }
     init(data) {
         if (data.client) {
@@ -55,6 +39,8 @@ export default class GameScene extends Phaser.Scene {
         return config
     }
     create() {
+        console.log('hello to game scene')
+
         // Pass here
         // Game has not starting yet
         this.gameState = this.GAMES_STATES['PREPARATION']
@@ -69,7 +55,8 @@ export default class GameScene extends Phaser.Scene {
         this.departurePortal = null
         this.arrivalPortal = null
         this.sceneRotated = false
-        this.HP_ARRAY = []
+        this.PLAYER_HP_ARRAY = []
+        this.ENEMY_HP_ARRAY = []
         this.isCountdownComplete = false
 
         this.isBugBottom = false
@@ -104,8 +91,18 @@ export default class GameScene extends Phaser.Scene {
                 if (this.playerHP >= 0) {
                     this.reloadSublevelPlayerHelp()
                 } else {
-                    // Игрок проиграл
-                    this.globalRestart()
+                    // Игрок проиграл (рестарт для slave)
+                    this.globalRestart('playerLost(info for slave)')
+                }
+            })
+            this.client.on('enemyHP', enemyHP => {
+                this.enemyHP = enemyHP
+                console.log('New enemyHP: ', this.enemyHP)
+                if (this.enemyHP >= 0) {
+                    this.reloadSublevelEnemyHelp()
+                } else {
+                    // Враг проиграл (рестарт для slave)
+                    this.globalRestart('enemyLost(info for slave)')
                 }
             })
         }
@@ -173,9 +170,9 @@ export default class GameScene extends Phaser.Scene {
         if (this.client && !this.client.master && !this.sceneRotated) {
             this.sceneRotated = true
             // cam.rotation = Math.PI
-            this.hp1.setAngle(180)
-            this.hp2.setAngle(180)
-            this.hp3.setAngle(180)
+            this.hpPlayer1.setAngle(180)
+            this.hpPlayer2.setAngle(180)
+            this.hpPlayer3.setAngle(180)
         }
 
 
@@ -187,13 +184,16 @@ export default class GameScene extends Phaser.Scene {
         this.events.on('enemyLostSayToSlave', this.enemyLostSayToSlave, this)
 
 
-
         this.startCountdown()
 
     }
     removePlayerOneHP() {
         // Удаляем одну жизнь
-        this.HP_ARRAY.pop().destroy()
+        this.PLAYER_HP_ARRAY.pop().destroy()
+    }
+    removeEnemyOneHP() {
+        // Удаляем одну жизнь
+        this.ENEMY_HP_ARRAY.pop().destroy()
     }
     reloadSublevelPlayer() {
         if (!this.isBugBottom) {
@@ -309,16 +309,29 @@ export default class GameScene extends Phaser.Scene {
     }
     initLabels() {
         if (this.client && !this.client.master && !this.sceneRotated) {
-            this.hp1 = this.add.sprite(config.width - 15, config.height - 35, 'HP').setOrigin(0, 0)
-            this.hp2 = this.add.sprite(config.width - 65, config.height - 35, 'HP').setOrigin(0, 0)
-            this.hp3 = this.add.sprite(config.width - 115, config.height - 35, 'HP').setOrigin(0, 0)
+            // Slave
+            // Player hp
+            this.hpPlayer1 = this.add.sprite(config.width - 15, config.height - 35, 'HP').setOrigin(0, 0)
+            this.hpPlayer2 = this.add.sprite(config.width - 65, config.height - 35, 'HP').setOrigin(0, 0)
+            this.hpPlayer3 = this.add.sprite(config.width - 115, config.height - 35, 'HP').setOrigin(0, 0)
+            // Enemy hp
+            this.hpEnemy1 = this.add.sprite(15, config.height - 35, 'HP').setOrigin(0, 0)
+            this.hpEnemy2 = this.add.sprite(65, config.height - 35, 'HP').setOrigin(0, 0)
+            this.hpEnemy3 = this.add.sprite(115, config.height - 35, 'HP').setOrigin(0, 0)
         }
         else {
-            this.hp1 = this.add.sprite(15, 35, 'HP').setOrigin(0, 0) // ???
-            this.hp2 = this.add.sprite(65, 35, 'HP').setOrigin(0, 0) // ???
-            this.hp3 = this.add.sprite(115, 35, 'HP').setOrigin(0, 0) // ???
+            // Master
+            // Player hp
+            this.hpPlayer1 = this.add.sprite(15, 35, 'HP').setOrigin(0, 0)
+            this.hpPlayer2 = this.add.sprite(65, 35, 'HP').setOrigin(0, 0)
+            this.hpPlayer3 = this.add.sprite(115, 35, 'HP').setOrigin(0, 0)
+            // Enemy hp
+            this.hpEnemy1 = this.add.sprite(config.width - 15, 35, 'HP').setOrigin(0, 0)
+            this.hpEnemy2 = this.add.sprite(config.width - 65, 35, 'HP').setOrigin(0, 0)
+            this.hpEnemy3 = this.add.sprite(config.width - 115, 35, 'HP').setOrigin(0, 0)
         }
-        this.HP_ARRAY.push(this.hp1, this.hp2, this.hp3)
+        this.PLAYER_HP_ARRAY.push(this.hpPlayer1, this.hpPlayer2, this.hpPlayer3)
+        this.ENEMY_HP_ARRAY.push(this.hpEnemy1, this.hpEnemy2, this.hpEnemy3)
 
     }
     startCountdown() {
@@ -370,6 +383,7 @@ export default class GameScene extends Phaser.Scene {
         console.log('GO to finish')
         // this.client.socket.emit('end')
         this.scene.start('Finish')
+
     }
     findOpposePortal(name) {
         if (name.split('').includes('2')) {
@@ -386,10 +400,13 @@ export default class GameScene extends Phaser.Scene {
             }
         }
     }
-    globalRestart() {
+    globalRestart(looser) {
+        console.log('In this game is looser : ', looser)
+
         this.events.emit('restart')
         // Сбрасываем показатели жизни до исходных и останавливаем игровой процесс
         this.playerHP = 3
+        this.enemyHP = 3
         this.gameIsProcessing = false
     }
 
