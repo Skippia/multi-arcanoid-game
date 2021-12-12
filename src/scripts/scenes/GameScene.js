@@ -49,9 +49,40 @@ export default class GameScene extends Phaser.Scene {
         }
         return config
     }
+    setBaseConfig(){
+
+    }
+    runMultiMode() {
+
+    }
+    runSingleMode(){
+
+    }
+    initHost(){
+
+    }
+    initSlave(){
+
+    }
+    setPhysicsWorld(){
+
+    }
+
+    setCameraRotationSettings(){
+
+    }
+
+    setTouchControls(){
+
+    }
+    setKeyboardControls(){
+        
+    }
     create() {
         console.log('hello to game scene')
         console.log('Mode is : ', mode)
+
+
 
         // Pass here
         // Game has not starting yet
