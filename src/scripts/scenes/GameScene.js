@@ -61,6 +61,17 @@ export default class GameScene extends Phaser.Scene {
 
         this.isBugBottom = false
         this.isBugTop = false
+        this.depth = {
+            floor: 0,
+            player: 1,
+            UI: 2
+        }
+        // Controls
+        this.is_holding = {
+            left: false,
+            right: false,
+            direction: false,
+        }
 
 
         this.cameras.main.setBounds(0, 0, 1024, 1024)
@@ -173,6 +184,9 @@ export default class GameScene extends Phaser.Scene {
         var cam = this.cameras.main
 
         if (this.client && !this.client.master && !this.sceneRotated) {
+            console.log('Create controls for slave')
+            this.createControlsSlave()
+
             this.sceneRotated = true
             cam.rotation = Math.PI
             this.hpPlayer1.setAngle(180)
@@ -182,6 +196,10 @@ export default class GameScene extends Phaser.Scene {
             this.hpEnemy1.setAngle(180)
             this.hpEnemy2.setAngle(180)
             this.hpEnemy3.setAngle(180)
+        } else {
+            console.log('Create controls for host')
+
+            this.createControlsHost()
         }
 
 
@@ -448,14 +466,125 @@ export default class GameScene extends Phaser.Scene {
             this.events.emit('restart', 'lost')
         }
 
-
-
-
         // Сбрасываем показатели жизни до исходных и останавливаем игровой процесс
         this.playerHP = 3
         this.enemyHP = 3
         this.gameIsProcessing = false
-
     }
+
+    // Controls....................
+    createControlsHost() {
+        // Create zones for input
+        let w = config.width
+        let h = config.height
+
+        this.zone_left = this.add.zone(150, h - 120, 160, 160)
+        this.zone_left.setDepth(this.depth.UI)
+        this.zone_left.setScrollFactor(0)
+
+        this.zone_right = this.add.zone(w - 150, h - 120, 160, 160)
+        this.zone_right.setDepth(this.depth.UI)
+        this.zone_right.setScrollFactor(0)
+
+        let debug = this.add.graphics({ x: 0, y: 0 })
+        debug.fillStyle('0x000000', 0.5)
+        // debug.fillRect(0, 0, w * 0.9, h * 2)
+        debug.fillCircleShape({ x: 150, y: h - 120, radius: 80 })
+        debug.setScrollFactor(0)
+        debug.setDepth(this.depth.UI)
+
+        let debug2 = this.add.graphics({ x: 0, y: 0 })
+        debug2.fillStyle('0x000000', 0.5)
+        // debug.fillRect(0, 0, w * 0.9, h * 2)
+        debug2.fillCircleShape({ x: w - 150, y: h - 120, radius: 80 })
+        debug2.setScrollFactor(0)
+        debug2.setDepth(this.depth.UI)
+
+
+        // Add input callback
+        this.zone_left.setInteractive()
+        this.zone_left.on('pointerdown', this.holdLeft, this)
+        this.zone_left.on('pointerup', this.releaseLeft, this)
+        this.zone_left.on('pointerout', this.releaseLeft, this)
+
+        this.zone_right.setInteractive()
+        this.zone_right.on('pointerdown', this.holdRight, this)
+        this.zone_right.on('pointerup', this.releaseRight, this)
+        this.zone_right.on('pointerout', this.releaseRight, this)
+    }
+    createControlsSlave() {
+        // Create zones for input
+        let w = config.width
+        let h = config.height
+
+        this.zone_left = this.add.zone(w - 150, 120, 160, 160)
+        this.zone_left.setDepth(this.depth.UI)
+        this.zone_left.setScrollFactor(0)
+
+        this.zone_right = this.add.zone(150, 120, 160, 160)
+        this.zone_right.setDepth(this.depth.UI)
+        this.zone_right.setScrollFactor(0)
+
+        let debug = this.add.graphics({ x: 0, y: 0 })
+        debug.fillStyle('0x000000', 0.5)
+        // debug.fillRect(0, 0, w * 0.9, h * 2)
+        debug.fillCircleShape({ x: 150, y: 120, radius: 80 })
+        debug.setScrollFactor(0)
+        debug.setDepth(this.depth.UI)
+
+        let debug2 = this.add.graphics({ x: 0, y: 0 })
+        debug2.fillStyle('0x000000', 0.5)
+        // debug.fillRect(0, 0, w * 0.9, h * 2)
+        debug2.fillCircleShape({ x: w - 150, y: 120, radius: 80 })
+        debug2.setScrollFactor(0)
+        debug2.setDepth(this.depth.UI)
+
+
+        // Add input callback
+        this.zone_left.setInteractive()
+        this.zone_left.on('pointerdown', this.holdLeft, this)
+        this.zone_left.on('pointerup', this.releaseLeft, this)
+        this.zone_left.on('pointerout', this.releaseLeft, this)
+
+        this.zone_right.setInteractive()
+        this.zone_right.on('pointerdown', this.holdRight, this)
+        this.zone_right.on('pointerup', this.releaseRight, this)
+        this.zone_right.on('pointerout', this.releaseRight, this)
+    }
+
+
+    holdLeft() {
+        this.is_holding.left = true
+        this.is_holding.direction = 'left'
+    }
+
+    holdRight() {
+
+        this.is_holding.right = true
+        this.is_holding.direction = 'right'
+    }
+
+    releaseLeft() {
+        console.log('left')
+
+        this.is_holding.left = false
+        if (this.is_holding.right) {
+            this.is_holding.direction = 'right'
+        } else {
+            this.is_holding.direction = false
+        }
+    }
+
+    releaseRight() {
+        console.log('right')
+
+        this.is_holding.right = false
+        if (this.is_holding.left) {
+            this.is_holding.direction = 'left'
+        } else {
+            this.is_holding.direction = false
+        }
+    }
+
 
 }

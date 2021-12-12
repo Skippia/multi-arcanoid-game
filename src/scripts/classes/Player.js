@@ -28,11 +28,26 @@ export default class Player {
     create() {
 
     }
-    get directions() {
+    get direction() {
         let directionH = this.DIRECTIONS_HORIZONTAL.NONE
-        let directionV = this.DIRECTIONS_VERTICAL.NONE
 
+        // Move platform via touch click
+        if (this.scene.is_holding.direction === 'left') {
+            if (this.scene.client && !this.scene.client.master) {
+                directionH = this.DIRECTIONS_HORIZONTAL.FORWARD
+            } else {
+                directionH = this.DIRECTIONS_HORIZONTAL.BACKWARD
+            }
+        }
+        else if (this.scene.is_holding.direction === 'right') {
+            if (this.scene.client && !this.scene.client.master) {
+                directionH = this.DIRECTIONS_HORIZONTAL.BACKWARD
+            } else {
+                directionH = this.DIRECTIONS_HORIZONTAL.FORWARD
+            }
+        }
 
+        // Move platform via <- & -> arrows
         if (this.scene.cursors.right.isDown) {
             if (this.scene.client && !this.scene.client.master) {
                 directionH = this.DIRECTIONS_HORIZONTAL.BACKWARD
@@ -48,13 +63,13 @@ export default class Player {
         }
 
 
-        return [directionH, directionV]
+        return directionH
     }
     get velocity() {
-        return [this.directions[0] * this.SPEED_HORIZONTAL, this.directions[1] * this.SPEED_VERTICAL]
+        return this.direction * this.SPEED_HORIZONTAL
     }
 
     move() {
-        this.player.setVelocity(this.velocity[0], this.velocity[1])
+        this.player.setVelocity(this.velocity, 0)
     }
 }
