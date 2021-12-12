@@ -41,10 +41,8 @@ export default class Ball {
     }
 
   }
-  move() {
-    this.checkPosition()
-  }
-  checkPosition() {
+
+  checkBallPosition() {
     const checkpoint = this.map.getCheckpoint(this.ball)
 
     if (checkpoint) {
@@ -55,11 +53,11 @@ export default class Ball {
 
     // Если мяч пересек нижнюю границу - значит игрок проиграл
     if (checkpoint == 'bottom' && this.playerCheckpointFirstEntrance) {
+      // Не отслеживаем следующие пересечения до рестарта игры
       this.playerCheckpointFirstEntrance = false
 
       // Если это не последняя жизнь, то просто начинаем попытку заново
       if (this.scene.playerHP > 0) {
-        console.log('BOTTOM LOSE')
         this.scene.isBugBottom = false
         // Фиксируем мяч в пространстве
         this.ball.x = config.width / 2
@@ -68,27 +66,31 @@ export default class Ball {
 
         // Сбрасываем счетчик первого захода в зону проигрыша для игрока player
         this.playerCheckpointFirstEntrance = true
-        // Сообщаем slave что игрок потерял жизнь
 
-        console.log('call player lose')
-
+        // Сообщаем GameScene что игрок потерял жизнь
         this.scene.events.emit('playerLose')
 
       } else {
         console.log('Game over!')
-        // Сообщаем slave что игрок проиграл
+        // Сообщаем GameScene что игрок проиграл
         this.scene.events.emit('playerLostSayToSlave')
+
+        console.log('Player lost hp')
+
+        // Сбрасываем счетчик первого захода в зону проигрыша для игрока player
         this.playerCheckpointFirstEntrance = true
         this.scene.globalRestart('playerLost')
       }
     }
 
+    // Вержняя граница как условие проигрыша есть только в мультиплеере
     else if (checkpoint == 'top' && this.enemyCheckpointFirstEntrance && mode.type == 'multi') {
+
+      // Не отслеживаем следующие пересечения до рестарта игры
       this.enemyCheckpointFirstEntrance = false
 
       // Если это не последняя жизнь, то просто начинаем попытку заново
       if (this.scene.enemyHP > 0) {
-        console.log('TOP LOSE')
         this.scene.isBugTop = false
 
         // Фиксируем мяч в пространстве
@@ -96,14 +98,12 @@ export default class Ball {
         this.ball.y = config.height / 2
         this.ball.setVelocity(0, 0)
 
-        // Сбрасываем счетчик первого захода в зону проигрыша для игрока player
+        // Сбрасываем счетчик первого захода в зону проигрыша для игрока enemy
+
+        console.log('Enemy lost hp')
+
         this.enemyCheckpointFirstEntrance = true
-        // Сообщаем slave что игрок потерял жизнь
-
-        console.log('call enemy lose')
-
         this.scene.events.emit('enemyLose')
-
       } else {
         console.log('Game over!')
         // Сообщаем slave что игрок проиграл

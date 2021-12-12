@@ -299,7 +299,7 @@ export default class GameScene extends Phaser.Scene {
                 this.ball.adjuctSpeedBall()
             }
             // Положение мяча и чекпоинты отслеживает только хост
-            this.ball.move()
+            this.ball.checkBallPosition()
 
             if (this.timeStop == true) {
 
