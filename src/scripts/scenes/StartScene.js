@@ -1,7 +1,9 @@
 import config from '../../index'
 import Client from '../classes/Client'
 
-export default class StartScene extends Phaser.Scene {
+let mode = { type: 'single' }
+
+class StartScene extends Phaser.Scene {
   constructor() {
     super('Start')
   }
@@ -25,7 +27,7 @@ export default class StartScene extends Phaser.Scene {
     //   this.scene.start('Game')
     // })
 
-    this.button1.on('pointerdown', this.startGame, this)
+    this.button1.on('pointerdown', this.startSingleGame, this)
     this.button2.on('pointerdown', this.requestGame, this)
   }
   createButtons() {
@@ -39,7 +41,15 @@ export default class StartScene extends Phaser.Scene {
 
 
   }
+  startSingleGame() {
+    mode.type = 'single'
+    this.client = undefined
+    this.scene.start('Game')
+  }
   startGame() {
+    mode.type = 'multi'
+    console.log(this.client)
+
     this.scene.start('Game', { client: this.client })
   }
   requestGame() {
@@ -52,3 +62,4 @@ export default class StartScene extends Phaser.Scene {
     // начать игру
   }
 }
+export { StartScene, mode }

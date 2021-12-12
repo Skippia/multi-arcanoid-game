@@ -1,4 +1,5 @@
 import config from '../../index'
+import { mode } from '../scenes/StartScene'
 
 export default class Ball {
   constructor(scene, map) {
@@ -82,7 +83,7 @@ export default class Ball {
       }
     }
 
-    else if (checkpoint == 'top' && this.enemyCheckpointFirstEntrance) {
+    else if (checkpoint == 'top' && this.enemyCheckpointFirstEntrance && mode.type == 'multi') {
       this.enemyCheckpointFirstEntrance = false
 
       // Если это не последняя жизнь, то просто начинаем попытку заново

@@ -2,6 +2,7 @@ const HOST = '/'
 
 import Phaser from 'phaser'
 import io from "socket.io/client-dist/socket.io"
+import { mode } from '../scenes/StartScene'
 
 export default class Client extends Phaser.Events.EventEmitter {
   constructor() {
@@ -50,9 +51,16 @@ export default class Client extends Phaser.Events.EventEmitter {
     }
   }
   sendPlayerHP(playerHP) {
-    this.socket.emit('playerHP', playerHP)
+    if (mode.type == 'multi') {
+      this.socket.emit('playerHP', playerHP)
+    }
   }
   sendEnemyHP(playerHP) {
-    this.socket.emit('enemyHP', playerHP)
+    if (mode.type == 'multi') {
+      this.socket.emit('enemyHP', playerHP)
+    }
+  }
+  closeServerSocket() {
+    this.socket.emit('end')
   }
 }

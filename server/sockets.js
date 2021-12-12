@@ -18,8 +18,12 @@ module.exports = {
                 this.onEnemyHP(socket, enemyHP)
             })
             socket.on('end', () => {
-                socket.disonnect(0)
-                console.log('Socket disconnect!')
+                // socket.disonnect()
+                this.sessions = []
+                console.log('clear sessions')
+                console.log(this.sessions)
+
+                // console.log('Server socket disconnect!!')
 
             })
             this.onConnection(socket)
@@ -102,6 +106,7 @@ module.exports = {
     createPendingSession(socket) {
         const session = { playerSocket: socket, enemySocket: null }
         this.sessions.push(session)
+
     },
     startGame(session) {
         session.playerSocket.emit('gameStart', { master: true })

@@ -3,6 +3,7 @@ import Phaser from "phaser"
 import Map from '../classes/Map'
 import Player from "../classes/Player"
 import Ball from "../classes/Ball"
+import { mode } from './StartScene'
 
 const PLATFORMS = {
     PLAYER_PLATFORM: {
@@ -18,9 +19,11 @@ const PLATFORMS = {
 export default class GameScene extends Phaser.Scene {
     constructor() {
         super('Game')
+
         this.GAMES_STATES = { 'PREPARATION': 'PREPARATION', 'START': 'START', 'TRY': 'TRY', 'FINISH': 'FINISH' }
     }
     init(data) {
+
         if (data.client) {
             this.client = data.client
         }
@@ -31,7 +34,13 @@ export default class GameScene extends Phaser.Scene {
     }
     getPlatformsConfig() {
         // конфиг 1го игрока
+
         let config = { player: PLATFORMS.PLAYER_PLATFORM, enemy: PLATFORMS.ENEMY_PLATFORM }
+
+        if (mode.type == 'single') {
+            return config
+        }
+
         if (this.client && !this.client.master) {
             // конфиг 2го игрока
             config = { player: PLATFORMS.ENEMY_PLATFORM, enemy: PLATFORMS.PLAYER_PLATFORM }
@@ -40,6 +49,7 @@ export default class GameScene extends Phaser.Scene {
     }
     create() {
         console.log('hello to game scene')
+        console.log('Mode is : ', mode)
 
         // Pass here
         // Game has not starting yet
@@ -72,12 +82,9 @@ export default class GameScene extends Phaser.Scene {
             right: false,
             direction: false,
         }
-
-
         this.cameras.main.setBounds(0, 0, 1024, 1024)
         this.cursors = this.input.keyboard.createCursorKeys()
         this.cameras.main.centerToBounds()
-
         this.matter.world.setBounds().disableGravity()
         const platform = this.getPlatformsConfig()
         this.map = new Map(this)
@@ -85,7 +92,8 @@ export default class GameScene extends Phaser.Scene {
         this.player = new Player(this, this.map, platform.player)
         this.player.ball = this.ball.ball
 
-        if (this.client) {
+        if (this.client && mode.type == 'multi') {
+            console.log('Multi player is active')
             this.enemy = new Player(this, this.map, platform.enemy)
             this.client.on('data', data => {
                 this.enemy.player.setX(data.x)
@@ -183,7 +191,7 @@ export default class GameScene extends Phaser.Scene {
 
         var cam = this.cameras.main
 
-        if (this.client && !this.client.master && !this.sceneRotated) {
+        if (this.client && !this.client.master && !this.sceneRotated && mode.type == 'multi') {
             console.log('Create controls for slave')
             this.createControlsSlave()
 
@@ -198,28 +206,26 @@ export default class GameScene extends Phaser.Scene {
             this.hpEnemy3.setAngle(180)
         } else {
             console.log('Create controls for host')
-
             this.createControlsHost()
         }
 
-
-
         this.events.on('playerLose', this.reloadSublevelPlayer, this)
         this.events.on('playerLostSayToSlave', this.playerLostSayToSlave, this)
-
         this.events.on('enemyLose', this.reloadSublevelEnemy, this)
         this.events.on('enemyLostSayToSlave', this.enemyLostSayToSlave, this)
-
-
         this.startCountdown()
-
     }
     removePlayerOneHP() {
         // Удаляем одну жизнь
-        this.PLAYER_HP_ARRAY.pop().destroy()
+        console.log('delete player hp')
+        if (this.PLAYER_HP_ARRAY.length > 0) {
+            this.PLAYER_HP_ARRAY.pop().destroy()
+        }
     }
     removeEnemyOneHP() {
         // Удаляем одну жизнь
+
+        console.log('delete enemy hp')
         this.ENEMY_HP_ARRAY.pop().destroy()
     }
     reloadSublevelPlayer() {
@@ -229,8 +235,10 @@ export default class GameScene extends Phaser.Scene {
             this.playerHP--
             console.log(this.playerHP)
 
-            // Отправляем информацию о хп на зависимый хост
-            this.client.sendPlayerHP(this.playerHP)
+            // Отправляем информацию о хп на зависимый хост, если это мультиплеер
+            if (mode.type == 'multi') {
+                this.client.sendPlayerHP(this.playerHP)
+            }
             this.reloadSublevelPlayerHelp()
         }
     }
@@ -249,7 +257,11 @@ export default class GameScene extends Phaser.Scene {
     }
 
     playerLostSayToSlave() {
-        this.client.sendPlayerHP(this.playerHP - 1)
+        if (mode.type == 'multi') {
+            this.client.sendPlayerHP(this.playerHP - 1)
+        } else {
+            this.globalRestart('playerLost')
+        }
     }
 
     enemyLostSayToSlave() {
@@ -281,12 +293,11 @@ export default class GameScene extends Phaser.Scene {
     }
     update() {
 
-        if (this.client && this.client.master) {
+        if (this.client && this.client.master || mode.type == 'single') {
             // Регулирует скорость мяча только хост
             if (this.gameIsProcessing) {
                 this.ball.adjuctSpeedBall()
             }
-
             // Положение мяча и чекпоинты отслеживает только хост
             this.ball.move()
 
@@ -304,7 +315,6 @@ export default class GameScene extends Phaser.Scene {
 
         }
 
-        this.sync()
 
         // Порталы отслеживает каждый клиент
         if (this.lastPortal && this.lastPortal.gameObject) {
@@ -318,65 +328,80 @@ export default class GameScene extends Phaser.Scene {
         // Положение платформ отслеживается обоими клиентами
         this.player.move()
 
+        if (mode.type == 'multi') {
+            this.sync()
+        }
     }
     sync() {
         // Синхронизирование движения происходит только в режиме мультиплеер
-        if (this.client) {
-            let ball = null
-            if (this.client.master) {
-                ball = this.player.ball
-            }
-            this.client.send({
-                x: this.player.player.x,
-                y: this.player.player.y,
-                // xB: this.ball.ball.x,
-                // yB: this.ball.ball.y,
-            }, ball)
+
+        let ball = null
+        if (this.client.master) {
+            ball = this.player.ball
         }
+        setTimeout(() => {
+            if (this.client && this.client.send) {
+                this.client.send({
+                    x: this.player.player.x,
+                    y: this.player.player.y,
+                    // xB: this.ball.ball.x,
+                    // yB: this.ball.ball.y,
+                }, ball)
+            }
+        }, 0)
+
     }
     initLabels() {
-        if (this.client && !this.client.master && !this.sceneRotated) {
-            // Slave
-            // Player hp
-            this.hpPlayer1 = this.add.sprite(config.width - 15, config.height - 100, 'HP').setOrigin(0)
-            this.hpPlayer2 = this.add.sprite(config.width - 65, config.height - 100, 'HP').setOrigin(0)
-            this.hpPlayer3 = this.add.sprite(config.width - 115, config.height - 100, 'HP').setOrigin(0)
-            // Enemy hp
-            this.hpEnemy1 = this.add.sprite(config.width - 15, config.height - 35, 'HPEnemy').setOrigin(0)
-            this.hpEnemy2 = this.add.sprite(config.width - 65, config.height - 35, 'HPEnemy').setOrigin(0)
-            this.hpEnemy3 = this.add.sprite(config.width - 115, config.height - 35, 'HPEnemy').setOrigin(0)
-        }
-        else {
-            // Master
-            // Player hp
+        if (mode.type == 'multi') {
+            if (this.client && !this.client.master && !this.sceneRotated) {
+                // Slave
+                // Player hp
+                this.hpPlayer1 = this.add.sprite(config.width - 15, config.height - 35, 'HPEnemy').setOrigin(0)
+                this.hpPlayer2 = this.add.sprite(config.width - 65, config.height - 35, 'HPEnemy').setOrigin(0)
+                this.hpPlayer3 = this.add.sprite(config.width - 115, config.height - 35, 'HPEnemy').setOrigin(0)
+                // Enemy hp
+                this.hpEnemy1 = this.add.sprite(config.width - 15, config.height - 100, 'HP').setOrigin(0)
+                this.hpEnemy2 = this.add.sprite(config.width - 65, config.height - 100, 'HP').setOrigin(0)
+                this.hpEnemy3 = this.add.sprite(config.width - 115, config.height - 100, 'HP').setOrigin(0)
+            }
+            else {
+                // Master
+                // Player hp
+                this.hpPlayer1 = this.add.sprite(15, 100, 'HP').setOrigin(0)
+                this.hpPlayer2 = this.add.sprite(65, 100, 'HP').setOrigin(0)
+                this.hpPlayer3 = this.add.sprite(115, 100, 'HP').setOrigin(0)
+                // Enemy hp
+                this.hpEnemy1 = this.add.sprite(15, 35, 'HPEnemy').setOrigin(0)
+                this.hpEnemy2 = this.add.sprite(65, 35, 'HPEnemy').setOrigin(0)
+                this.hpEnemy3 = this.add.sprite(115, 35, 'HPEnemy').setOrigin(0)
+            }
+            this.PLAYER_HP_ARRAY.push(this.hpPlayer1, this.hpPlayer2, this.hpPlayer3)
+            this.ENEMY_HP_ARRAY.push(this.hpEnemy1, this.hpEnemy2, this.hpEnemy3)
+
+        } else if (mode.type == 'single') {
             this.hpPlayer1 = this.add.sprite(15, 100, 'HP').setOrigin(0)
             this.hpPlayer2 = this.add.sprite(65, 100, 'HP').setOrigin(0)
             this.hpPlayer3 = this.add.sprite(115, 100, 'HP').setOrigin(0)
-            // Enemy hp
-            this.hpEnemy1 = this.add.sprite(15, 35, 'HPEnemy').setOrigin(0)
-            this.hpEnemy2 = this.add.sprite(65, 35, 'HPEnemy').setOrigin(0)
-            this.hpEnemy3 = this.add.sprite(115, 35, 'HPEnemy').setOrigin(0)
+            this.PLAYER_HP_ARRAY.push(this.hpPlayer1, this.hpPlayer2, this.hpPlayer3)
         }
-        this.PLAYER_HP_ARRAY.push(this.hpPlayer1, this.hpPlayer2, this.hpPlayer3)
-        this.ENEMY_HP_ARRAY.push(this.hpEnemy1, this.hpEnemy2, this.hpEnemy3)
 
     }
     startCountdown() {
         this.gameIsProcessing = false
         let time3 = this.add.sprite(config.width / 2, config.height / 2, 'time3')
-        if (this.client && !this.client.master) {
+        if (this.client && !this.client.master && mode.type == 'multi') {
             time3.setAngle(180)
         }
         setTimeout(() => {
             time3.destroy()
             let time2 = this.add.sprite(config.width / 2, config.height / 2, 'time2')
-            if (this.client && !this.client.master) {
+            if (this.client && !this.client.master && mode.type == 'multi') {
                 time2.setAngle(180)
             }
             setTimeout(() => {
                 time2.destroy()
                 let time1 = this.add.sprite(config.width / 2, config.height / 2, 'time1')
-                if (this.client && !this.client.master) {
+                if (this.client && !this.client.master && mode.type == 'multi') {
                     time1.setAngle(180)
                 }
                 setTimeout(() => {
@@ -418,7 +443,17 @@ export default class GameScene extends Phaser.Scene {
     onRestart(conditionGame) {
         console.log('GO to finish')
 
-        // this.client.socket.emit('end')
+        if (mode.type == 'multi') {
+            // Закрываем серверный сокет
+            // this.client.closeServerSocket()
+            // Закрываем клиентский сокет
+            this.client.socket.close()
+            setTimeout(() => {
+                this.client = {}
+            }, 50)
+        }
+
+
 
         // Игра была успешно перезапущена, поэтому теперь ее вновь можно будет перезапустить в будущем
         if (conditionGame == 'win') {
@@ -448,21 +483,25 @@ export default class GameScene extends Phaser.Scene {
         let config = null
         let configScreen = [{ 'master': 'win', 'slave': 'lost' }, { 'master': 'lost', 'slave': 'win' }]
 
-        if (looser == 'playerLost' && this.client && this.client.master) {
-            // Это хост и он проиграл
-            console.log('You (host) has lost!')
-            this.events.emit('restart', 'lost')
-        } else if (looser == 'playerLost' && this.client && !this.client.master) {
-            // Это slave и он выиграл
-            console.log('You (slave) has win!')
-            this.events.emit('restart', 'win')
-        } else if (looser == 'enemyLost' && this.client && this.client.master) {
-            // Это хост и он выиграл
-            console.log('You (host) has win!')
-            this.events.emit('restart', 'win')
-        } else if (looser == 'enemyLost' && this.client && !this.client.master) {
-            // Это slave  и он проиграл
-            console.log('You (slave) has lost!')
+        if (mode.type == 'multi') {
+            if (looser == 'playerLost' && this.client && this.client.master) {
+                // Это хост и он проиграл
+                console.log('You (host) has lost!')
+                this.events.emit('restart', 'lost')
+            } else if (looser == 'playerLost' && this.client && !this.client.master) {
+                // Это slave и он выиграл
+                console.log('You (slave) has win!')
+                this.events.emit('restart', 'win')
+            } else if (looser == 'enemyLost' && this.client && this.client.master) {
+                // Это хост и он выиграл
+                console.log('You (host) has win!')
+                this.events.emit('restart', 'win')
+            } else if (looser == 'enemyLost' && this.client && !this.client.master) {
+                // Это slave  и он проиграл
+                console.log('You (slave) has lost!')
+                this.events.emit('restart', 'lost')
+            }
+        } else {
             this.events.emit('restart', 'lost')
         }
 
