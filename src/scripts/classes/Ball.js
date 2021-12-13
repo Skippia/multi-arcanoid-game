@@ -69,11 +69,11 @@ export default class Ball {
         this.scene.events.emit('playerLose')
 
       } else {
-        console.log('Game over!')
+        // console.log('Game over!')
         // Сообщаем GameScene что игрок проиграл
         this.scene.events.emit('playerLostSayToSlave')
 
-        console.log('Player lost hp')
+        // console.log('Player lost hp')
 
         // Сбрасываем счетчик первого захода в зону проигрыша для игрока player
         this.playerCheckpointFirstEntrance = true
@@ -98,12 +98,12 @@ export default class Ball {
 
         // Сбрасываем счетчик первого захода в зону проигрыша для игрока enemy
 
-        console.log('Enemy lost hp')
+        // console.log('Enemy lost hp')
 
         this.enemyCheckpointFirstEntrance = true
         this.scene.events.emit('enemyLose')
       } else {
-        console.log('Game over!')
+        // console.log('Game over!')
         // Сообщаем slave что игрок проиграл
         this.scene.events.emit('enemyLostSayToSlave')
         this.enemyCheckpointFirstEntrance = true

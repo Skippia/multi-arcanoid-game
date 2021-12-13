@@ -192,7 +192,7 @@ export default class GameScene extends Phaser.Scene {
         this.client.on('playerHP', playerHP => {
             // Если игра еще не была перезапущена, то начинаем ее перезапуск и выключаем этот флаг
             this.playerHP = playerHP
-            console.log('New playerHP: ', this.playerHP)
+            // console.log('New playerHP: ', this.playerHP)
             if (this.playerHP >= 0) {
                 this.reloadSublevelPlayerHelp()
             } else {
@@ -203,7 +203,7 @@ export default class GameScene extends Phaser.Scene {
         this.client.on('enemyHP', enemyHP => {
 
             this.enemyHP = enemyHP
-            console.log('New enemyHP: ', this.enemyHP)
+            // console.log('New enemyHP: ', this.enemyHP)
             if (this.enemyHP >= 0) {
                 this.reloadSublevelEnemyHelp()
             } else {
@@ -213,7 +213,7 @@ export default class GameScene extends Phaser.Scene {
             }
         })
         this.client.on('sayHostToStopTime', () => {
-            console.log('Need to stop time (msg from slave!!!!!!!!!!!!!!!!!!)')
+            // console.log('Need to stop time (msg from slave!!!!!!!!!!!!!!!!!!)')
             // Останавливаем время на хосте => и на slave
             this.stopTimeActivate()
         })
@@ -221,8 +221,8 @@ export default class GameScene extends Phaser.Scene {
     }
 
     create() {
-        console.log('hello to game scene')
-        console.log('Mode is : ', mode)
+        // console.log('hello to game scene')
+        // console.log('Mode is : ', mode)
         this.setBaseConfig()
         this.setCameraRotationSettings()
         this.setPhysicsWorld()
@@ -238,7 +238,7 @@ export default class GameScene extends Phaser.Scene {
 
         // Multi mode has actived
         if (this.client && mode.type == 'multi') {
-            console.log('Multi mode has actived...')
+            // console.log('Multi mode has actived...')
 
             // Create enemy platform
             this.enemy = new Player(this, this.map, this.platform.enemy)
@@ -247,12 +247,12 @@ export default class GameScene extends Phaser.Scene {
 
         } else {
             this.generateBlocks()
-            console.log('Single mode has actived...')
+            // console.log('Single mode has actived...')
         }
 
         // Initialization controls touch + rotating slave screen
         if (this.client && !this.client.master && !this.sceneRotated && mode.type == 'multi') {
-            console.log('Create controls for slave')
+            // console.log('Create controls for slave')
             this.createControlsSlave()
 
             this.sceneRotated = true
@@ -266,7 +266,7 @@ export default class GameScene extends Phaser.Scene {
             this.hpEnemy3.setAngle(180)
             this.timeDebug.setAngle(180)
         } else {
-            console.log('Create controls for host | for single mode')
+            // console.log('Create controls for host | for single mode')
             this.createControlsHost()
         }
 
@@ -279,7 +279,7 @@ export default class GameScene extends Phaser.Scene {
             this.isBugBottom = true
             // Уменьшаем кол-во ХП игрока на хосте
             this.playerHP--
-            console.log(this.playerHP)
+            // console.log(this.playerHP)
 
             // Отправляем информацию о хп на зависимый хост, если это мультиплеер
             if (mode.type == 'multi') {
@@ -294,7 +294,7 @@ export default class GameScene extends Phaser.Scene {
             this.isBugTop = true
             // Уменьшаем кол-во ХП игрока на хосте
             this.enemyHP--
-            console.log(this.enemyHP)
+            // console.log(this.enemyHP)
 
             // Отправляем информацию о хп на зависимый хост
             this.client.sendEnemyHP(this.enemyHP)
@@ -440,7 +440,7 @@ export default class GameScene extends Phaser.Scene {
 
         // Игра запускается только один раз - когда флаг gameIsProcessing = false
         if (this.gameState == 'START' && !this.gameIsProcessing) {
-            console.log('start game 420')
+            // console.log('start game 420')
 
             this.initStartGame()
         }
@@ -457,7 +457,7 @@ export default class GameScene extends Phaser.Scene {
         this.gameIsProcessing = true
     }
     onRestart(conditionGame) {
-        console.log('GO to finish')
+        // console.log('GO to finish')
 
         if (mode.type == 'multi') {
             // Закрываем серверный сокет
@@ -477,24 +477,24 @@ export default class GameScene extends Phaser.Scene {
 
     }
     globalRestart(looser) {
-        console.log('In this game is looser : ', looser)
+        // console.log('In this game is looser : ', looser)
 
         if (mode.type == 'multi') {
             if (looser == 'playerLost' && this.client && this.client.master) {
                 // Это хост и он проиграл
-                console.log('You (host) has lost!')
+                // console.log('You (host) has lost!')
                 this.events.emit('restart', 'lost')
             } else if (looser == 'playerLost' && this.client && !this.client.master) {
                 // Это slave и он выиграл
-                console.log('You (slave) has win!')
+                // console.log('You (slave) has win!')
                 this.events.emit('restart', 'win')
             } else if (looser == 'enemyLost' && this.client && this.client.master) {
                 // Это хост и он выиграл
-                console.log('You (host) has win!')
+                // console.log('You (host) has win!')
                 this.events.emit('restart', 'win')
             } else if (looser == 'enemyLost' && this.client && !this.client.master) {
                 // Это slave  и он проиграл
-                console.log('You (slave) has lost!')
+                // console.log('You (slave) has lost!')
                 this.events.emit('restart', 'lost')
             }
         } else {
@@ -570,14 +570,14 @@ export default class GameScene extends Phaser.Scene {
     }
     removePlayerOneHP() {
         // Удаляем одну жизнь
-        console.log('delete player hp')
+        // console.log('delete player hp')
         if (this.PLAYER_HP_ARRAY.length > 0) {
             this.PLAYER_HP_ARRAY.pop().destroy()
         }
     }
     removeEnemyOneHP() {
         // Удаляем одну жизнь
-        console.log('delete enemy hp')
+        // console.log('delete enemy hp')
         this.ENEMY_HP_ARRAY.pop().destroy()
     }
     // Controls....................
@@ -672,7 +672,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     releaseLeft() {
-        console.log('left')
+        // console.log('left')
 
         this.is_holding.left = false
         if (this.is_holding.right) {
@@ -683,7 +683,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     releaseRight() {
-        console.log('right')
+        // console.log('right')
 
         this.is_holding.right = false
         if (this.is_holding.left) {
@@ -697,7 +697,7 @@ export default class GameScene extends Phaser.Scene {
     generateBlocks() {
 
         countOfBlocks = Math.floor(2 + Math.random() * 3) // 2 - 4
-        console.log('Random: ', countOfBlocks)
+        // console.log('Random: ', countOfBlocks)
 
 
         let sizeBlock = 128
@@ -712,11 +712,11 @@ export default class GameScene extends Phaser.Scene {
                 if (bodyB.gameObject && bodyB.gameObject.type == 'Image') {
                     blocks[bodyB.gameObject.name].destroy()
                     countOfDestroyed = countOfDestroyed + 1
-                    console.log('Destroyed: ', countOfDestroyed)
-                    console.log('Total : ', countOfBlocks)
+                    // console.log('Destroyed: ', countOfDestroyed)
+                    // console.log('Total : ', countOfBlocks)
 
                     if (countOfDestroyed >= countOfBlocks) {
-                        console.log('You are win!')
+                        // console.log('You are win!')
                         this.globalRestart('all block destroyed')
                     }
 
@@ -729,7 +729,7 @@ export default class GameScene extends Phaser.Scene {
         })
     }
     stopTimeSkillInitHost() {
-        console.log('init stop skill host')
+        // console.log('init stop skill host')
 
         let w = config.width
         let h = config.height
@@ -748,7 +748,7 @@ export default class GameScene extends Phaser.Scene {
         this.zone_time.on('pointerdown', this.stopTimeActivate, this)
     }
     stopTimeSkillInitSlave() {
-        console.log('init stop skill slave')
+        // console.log('init stop skill slave')
         let w = config.width
         let h = config.height
 
@@ -784,7 +784,7 @@ export default class GameScene extends Phaser.Scene {
 
 
             this.timeDebug.alpha = 0.2
-            console.log('stop game activate!')
+            // console.log('stop game activate!')
 
             this.LAST_VELOCITY.x = this.ball.ball.body.velocity.x
             this.LAST_VELOCITY.y = this.ball.ball.body.velocity.y
@@ -794,7 +794,7 @@ export default class GameScene extends Phaser.Scene {
 
 
             setTimeout(() => {
-                console.log('Time goes itself turn!')
+                // console.log('Time goes itself turn!')
                 this.timeStop = false
                 this.ball.ball.setVelocityX(this.LAST_VELOCITY.x)
                 this.ball.ball.setVelocityY(this.LAST_VELOCITY.y)
@@ -803,9 +803,9 @@ export default class GameScene extends Phaser.Scene {
 
             setTimeout(() => {
                 this.timeDebug.alpha = 1
-                console.log('Reload skill time!')
+                // console.log('Reload skill time!')
                 this.timeSkillBtnReady = true
-            }, 5000)
+            }, 3500)
 
         }
 

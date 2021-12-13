@@ -8,7 +8,7 @@ class StartScene extends Phaser.Scene {
     super('Start')
   }
   create() {
-    console.log('StartScene.create')
+    // console.log('StartScene.create')
     this.createBackground()
     // this.createText()
     this.createButtons()

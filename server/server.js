@@ -25,5 +25,5 @@ sockets.init(server)
 
 // 5. запускаем сервер
 server.listen(PORT, () => {
-    console.log(`server is running on port ${PORT}`)
+    // console.log(`server is running on port ${PORT}`)
 })

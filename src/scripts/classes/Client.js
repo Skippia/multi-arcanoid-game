@@ -19,10 +19,10 @@ export default class Client extends Phaser.Events.EventEmitter {
 
     // Group socket on events
     this.socket.on('connect', () => {
-      console.log('client connected')
+      // console.log('client connected')
     })
     this.socket.on('disconnect', () => {
-      console.log('client disconnected')
+      // console.log('client disconnected')
     })
     this.socket.on('gameStart', data => {
       if (data && data.master) {
@@ -70,7 +70,7 @@ export default class Client extends Phaser.Events.EventEmitter {
   }
   sayHostToStopTime() {
     if (mode.type == 'multi') {
-      console.log('7373737373773737373773')
+      // console.log('7373737373773737373773')
 
       this.socket.emit('sayHostToStopTime')
     }

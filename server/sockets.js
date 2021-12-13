@@ -139,7 +139,7 @@ module.exports = {
         session.enemySocket.emit('gameStart')
     },
     onConnection(socket) {
-        console.log(`new user connected ${socket.id}`)
+        // console.log(`new user connected ${socket.id}`)
 
         // получить текущую ожидающую игровую сессию
         let session = this.getPendingSession()
