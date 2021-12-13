@@ -43,6 +43,9 @@ export default class Client extends Phaser.Events.EventEmitter {
     this.socket.on('enemyHP', enemyHP => {
       this.emit('enemyHP', enemyHP)
     })
+    this.socket.on('sayHostToStopTime', () => {
+      this.emit('sayHostToStopTime')
+    })
     // End group socket on events
   }
   send(data, ball) {
@@ -63,6 +66,13 @@ export default class Client extends Phaser.Events.EventEmitter {
   sendEnemyHP(playerHP) {
     if (mode.type == 'multi') {
       this.socket.emit('enemyHP', playerHP)
+    }
+  }
+  sayHostToStopTime() {
+    if (mode.type == 'multi') {
+      console.log('7373737373773737373773')
+
+      this.socket.emit('sayHostToStopTime')
     }
   }
   /*   closeServerSocket() {

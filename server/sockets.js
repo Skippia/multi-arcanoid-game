@@ -17,6 +17,9 @@ module.exports = {
             socket.on('enemyHP', enemyHP => {
                 this.onEnemyHP(socket, enemyHP)
             })
+            socket.on('sayHostToStopTime', () => {
+                this.sayHostToStopTime(socket)
+            })
             /*    socket.on('end', () => {
                    // socket.disonnect()
                    this.sessions = []
@@ -100,6 +103,25 @@ module.exports = {
             }
         }
     },
+    sayHostToStopTime(socket) {
+        // Ищем сессию , отправившиую запрос
+        const session = this.sessions.find(session => session.playerSocket === socket || session.enemySocket === socket)
+
+        if (session) {
+            let opponentSocket = null
+            // Если наша сессия - сессия игрока, значит противоложная сессия - врага
+            if (session.playerSocket === socket) {
+                opponentSocket = session.enemySocket
+            } else {
+                opponentSocket = session.playerSocket
+            }
+            if (opponentSocket) {
+                opponentSocket.emit('sayHostToStopTime')
+            }
+        }
+
+    },
+
     // находит сессию, в которой есть сокет игрока, но нет сокета противника (игрок ждет оппонента)
     getPendingSession() {
         return this.sessions.find(session => session.playerSocket && !session.enemySocket)

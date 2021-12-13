@@ -60,6 +60,8 @@ export default class GameScene extends Phaser.Scene {
         this.angle = 0
         this.lastPortal = {}
         this.LAST_POSITION = {}
+        this.LAST_VELOCITY = {}
+        this.timeSkillBtnReady = true
         this.timeStop = false
         this.firstPassT = true
         this.departurePortal = null
@@ -113,11 +115,18 @@ export default class GameScene extends Phaser.Scene {
 
                         this.LAST_POSITION.x = toP.x + 80
                         this.LAST_POSITION.y = toP.y - 80
+
+                        this.LAST_VELOCITY.x = this.ball.ball.body.velocity.x
+                        this.LAST_VELOCITY.y = this.ball.ball.body.velocity.y
+
                         this.timeStop = true
 
                         setTimeout(() => {
                             this.timeStop = false
                             this.ball.ball.setVisible(true)
+                            this.ball.ball.setVelocityX(this.LAST_VELOCITY.x)
+                            this.ball.ball.setVelocityY(this.LAST_VELOCITY.y)
+                            this.firstSetBallPosition = false
                             // this.ball.ball.x = toP.x
                             // this.ball.ball.y = toP.y
                         }, 200)
@@ -202,8 +211,13 @@ export default class GameScene extends Phaser.Scene {
                 // Начинаем перезапуск игры
                 this.globalRestart('enemyLost')
             }
-
         })
+        this.client.on('sayHostToStopTime', () => {
+            console.log('Need to stop time (msg from slave!!!!!!!!!!!!!!!!!!)')
+            // Останавливаем время на хосте => и на slave
+            this.stopTimeActivate()
+        })
+
     }
 
     create() {
@@ -335,13 +349,22 @@ export default class GameScene extends Phaser.Scene {
             this.ball.checkBallPosition()
 
             if (this.timeStop == true) {
+
+
                 /* if (this.firstPassT) {
                 this.LAST_POSITION = { x: this.ball.ball.x, y: this.ball.ball.y }
                 console.log(this.LAST_POSITION)
                 this.firstPassT = false
                 } */
-                this.ball.ball.x = this.LAST_POSITION.x
-                this.ball.ball.y = this.LAST_POSITION.y
+                // Velocity zero
+                this.ball.ball.setVelocity(0)
+                //xxx
+                if (!this.firstSetBallPosition) {
+                    this.ball.ball.x = this.LAST_POSITION.x
+                    this.ball.ball.y = this.LAST_POSITION.y
+                    this.firstSetBallPosition = true
+                }
+
             }
         }
 
@@ -475,7 +498,6 @@ export default class GameScene extends Phaser.Scene {
                 this.events.emit('restart', 'lost')
             }
         } else {
-            // xyu
             blocks = {}
             countOfBlocks = 0
             countOfDestroyed = 0
@@ -743,12 +765,29 @@ export default class GameScene extends Phaser.Scene {
         this.zone_time.setInteractive()
         this.zone_time.on('pointerdown', this.stopTimeActivate, this)
     }
+
+    // Если время пока не остановлено -> останавливаем его
     stopTimeActivate() {
-        // Если время пока не остановлено -> останавливаем его
-        if (!this.timeStop) {
+
+        if (!this.timeStop && this.timeSkillBtnReady) {
+            // if (this.timeSkillBtnReady) {
+
+            this.timeSkillBtnReady = false
+
+            // Если это slave, то нужно пробросить событие через сокет о том, что нужно остановить время на
+            // master клиенте
+            if (this.client && !this.client.master && mode.type == 'multi') {
+                this.client.sayHostToStopTime()
+            }
+
             this.timeStop = true
+
+
             this.timeDebug.alpha = 0.2
             console.log('stop game activate!')
+
+            this.LAST_VELOCITY.x = this.ball.ball.body.velocity.x
+            this.LAST_VELOCITY.y = this.ball.ball.body.velocity.y
 
             this.LAST_POSITION.x = this.ball.ball.x
             this.LAST_POSITION.y = this.ball.ball.y
@@ -757,11 +796,15 @@ export default class GameScene extends Phaser.Scene {
             setTimeout(() => {
                 console.log('Time goes itself turn!')
                 this.timeStop = false
+                this.ball.ball.setVelocityX(this.LAST_VELOCITY.x)
+                this.ball.ball.setVelocityY(this.LAST_VELOCITY.y)
+                this.firstSetBallPosition = false
             }, 1000)
 
             setTimeout(() => {
                 this.timeDebug.alpha = 1
                 console.log('Reload skill time!')
+                this.timeSkillBtnReady = true
             }, 5000)
 
         }
