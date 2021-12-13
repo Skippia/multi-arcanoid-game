@@ -49,43 +49,7 @@ export default class GameScene extends Phaser.Scene {
         }
         return config
     }
-    setBaseConfig(){
-
-    }
-    runMultiMode() {
-
-    }
-    runSingleMode(){
-
-    }
-    initHost(){
-
-    }
-    initSlave(){
-
-    }
-    setPhysicsWorld(){
-
-    }
-
-    setCameraRotationSettings(){
-
-    }
-
-    setTouchControls(){
-
-    }
-    setKeyboardControls(){
-        
-    }
-    create() {
-        console.log('hello to game scene')
-        console.log('Mode is : ', mode)
-
-
-
-        // Pass here
-        // Game has not starting yet
+    setBaseConfig() {
         this.gameState = this.GAMES_STATES['PREPARATION']
         this.gameIsProcessing = false
         this.playerHP = 3
@@ -101,72 +65,23 @@ export default class GameScene extends Phaser.Scene {
         this.PLAYER_HP_ARRAY = []
         this.ENEMY_HP_ARRAY = []
         this.isCountdownComplete = false
-
         this.isBugBottom = false
         this.isBugTop = false
-        this.depth = {
-            floor: 0,
-            player: 1,
-            UI: 2
-        }
-        // Controls
-        this.is_holding = {
-            left: false,
-            right: false,
-            direction: false,
-        }
-        this.cameras.main.setBounds(0, 0, 1024, 1024)
-        this.cursors = this.input.keyboard.createCursorKeys()
-        this.cameras.main.centerToBounds()
+    }
+    runMultiMode() {
+
+    }
+    runSingleMode() {
+
+    }
+    initHost() {
+
+    }
+    initSlave() {
+
+    }
+    setPhysicsWorld() {
         this.matter.world.setBounds().disableGravity()
-        const platform = this.getPlatformsConfig()
-        this.map = new Map(this)
-        this.ball = new Ball(this, this.map)
-        this.player = new Player(this, this.map, platform.player)
-        this.player.ball = this.ball.ball
-
-        if (this.client && mode.type == 'multi') {
-            console.log('Multi player is active')
-            this.enemy = new Player(this, this.map, platform.enemy)
-            this.client.on('data', data => {
-                this.enemy.player.setX(data.x)
-                this.enemy.player.setY(data.y)
-            })
-            this.client.on('dataBall', ball => {
-                this.ball.ball.setX(ball.x)
-                this.ball.ball.setY(ball.y)
-            })
-
-            this.client.on('playerHP', playerHP => {
-                // Если игра еще не была перезапущена, то начинаем ее перезапуск и выключаем этот флаг
-                this.playerHP = playerHP
-                console.log('New playerHP: ', this.playerHP)
-                if (this.playerHP >= 0) {
-                    this.reloadSublevelPlayerHelp()
-                } else {
-                    // Игрок проиграл (рестарт для slave)
-                    this.globalRestart('playerLost')
-                }
-            })
-            this.client.on('enemyHP', enemyHP => {
-
-                this.enemyHP = enemyHP
-                console.log('New enemyHP: ', this.enemyHP)
-                if (this.enemyHP >= 0) {
-                    this.reloadSublevelEnemyHelp()
-                } else {
-                    // Враг проиграл (рестарт для slave)
-                    // Начинаем перезапуск игры
-                    this.globalRestart('enemyLost')
-                }
-
-            })
-
-        }
-
-        this.initLabels()
-        this.events.on('restart', this.onRestart, this)
-
 
         this.matter.world.on('collisionstart', (event, bodyA, bodyB) => {
             if (bodyB.gameObject && bodyB.gameObject.frame && bodyB.gameObject.frame.texture && bodyB.gameObject.frame.texture.firstFrame == 'ball'
@@ -221,8 +136,111 @@ export default class GameScene extends Phaser.Scene {
 
             }
         })
+    }
 
+    setCameraRotationSettings() {
+        this.cameras.main.setBounds(0, 0, 1024, 1024)
+        this.cursors = this.input.keyboard.createCursorKeys()
+        this.cameras.main.centerToBounds()
+
+    }
+
+    setTouchControls() {
+        this.depth = {
+            floor: 0,
+            player: 1,
+            UI: 2
+        }
+
+        this.is_holding = {
+            left: false,
+            right: false,
+            direction: false,
+        }
+    }
+    setKeyboardControls() {
+
+    }
+    createMap() {
+        this.map = new Map(this)
+    }
+    createBall() {
+        this.ball = new Ball(this, this.map)
+    }
+    createPlayer() {
+        this.platform = this.getPlatformsConfig()
+        this.player = new Player(this, this.map, this.platform.player)
+        this.player.ball = this.ball.ball
+    }
+    setEvents() {
+        this.events.on('restart', this.onRestart, this)
+        this.events.on('playerLose', this.reloadSublevelPlayer, this)
+        this.events.on('playerLostSayToSlave', this.playerLostSayToSlave, this)
+        this.events.on('enemyLose', this.reloadSublevelEnemy, this)
+        this.events.on('enemyLostSayToSlave', this.enemyLostSayToSlave, this)
+    }
+
+    create() {
+        console.log('hello to game scene')
+        console.log('Mode is : ', mode)
+
+        this.setBaseConfig()
+        this.setCameraRotationSettings()
         var cam = this.cameras.main
+
+        this.setPhysicsWorld()
+        this.setTouchControls()
+
+        this.createMap()
+        this.createBall()
+        this.createPlayer()
+        this.initLabels()
+        this.setEvents()
+
+        if (this.client && mode.type == 'multi') {
+            console.log('Multi player is active')
+            this.enemy = new Player(this, this.map, this.platform.enemy)
+            this.client.on('data', data => {
+                this.enemy.player.setX(data.x)
+                this.enemy.player.setY(data.y)
+            })
+            this.client.on('dataBall', ball => {
+                this.ball.ball.setX(ball.x)
+                this.ball.ball.setY(ball.y)
+            })
+
+            this.client.on('playerHP', playerHP => {
+                // Если игра еще не была перезапущена, то начинаем ее перезапуск и выключаем этот флаг
+                this.playerHP = playerHP
+                console.log('New playerHP: ', this.playerHP)
+                if (this.playerHP >= 0) {
+                    this.reloadSublevelPlayerHelp()
+                } else {
+                    // Игрок проиграл (рестарт для slave)
+                    this.globalRestart('playerLost')
+                }
+            })
+            this.client.on('enemyHP', enemyHP => {
+
+                this.enemyHP = enemyHP
+                console.log('New enemyHP: ', this.enemyHP)
+                if (this.enemyHP >= 0) {
+                    this.reloadSublevelEnemyHelp()
+                } else {
+                    // Враг проиграл (рестарт для slave)
+                    // Начинаем перезапуск игры
+                    this.globalRestart('enemyLost')
+                }
+
+            })
+
+        }
+
+
+
+
+
+
 
         if (this.client && !this.client.master && !this.sceneRotated && mode.type == 'multi') {
             console.log('Create controls for slave')
@@ -242,10 +260,10 @@ export default class GameScene extends Phaser.Scene {
             this.createControlsHost()
         }
 
-        this.events.on('playerLose', this.reloadSublevelPlayer, this)
-        this.events.on('playerLostSayToSlave', this.playerLostSayToSlave, this)
-        this.events.on('enemyLose', this.reloadSublevelEnemy, this)
-        this.events.on('enemyLostSayToSlave', this.enemyLostSayToSlave, this)
+        /*  this.events.on('playerLose', this.reloadSublevelPlayer, this)
+         this.events.on('playerLostSayToSlave', this.playerLostSayToSlave, this)
+         this.events.on('enemyLose', this.reloadSublevelEnemy, this)
+         this.events.on('enemyLostSayToSlave', this.enemyLostSayToSlave, this) */
         this.startCountdown()
     }
     removePlayerOneHP() {
@@ -543,6 +561,21 @@ export default class GameScene extends Phaser.Scene {
         this.enemyHP = 3
         this.gameIsProcessing = false
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // Controls....................
     createControlsHost() {
