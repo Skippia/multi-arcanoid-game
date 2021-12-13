@@ -70,6 +70,7 @@ export default class GameScene extends Phaser.Scene {
         this.isCountdownComplete = false
         this.isBugBottom = false
         this.isBugTop = false
+        this.timeHasStoped = false
 
     }
     setPhysicsWorld() {
@@ -220,7 +221,6 @@ export default class GameScene extends Phaser.Scene {
 
         this.initLabels()
         this.setEvents()
-        this.generateBlocks()
 
         // Multi mode has actived
         if (this.client && mode.type == 'multi') {
@@ -232,6 +232,7 @@ export default class GameScene extends Phaser.Scene {
             this.setClientEvents()
 
         } else {
+            this.generateBlocks()
             console.log('Single mode has actived...')
         }
 
@@ -249,6 +250,7 @@ export default class GameScene extends Phaser.Scene {
             this.hpEnemy1.setAngle(180)
             this.hpEnemy2.setAngle(180)
             this.hpEnemy3.setAngle(180)
+            this.timeDebug.setAngle(180)
         } else {
             console.log('Create controls for host | for single mode')
             this.createControlsHost()
@@ -372,8 +374,7 @@ export default class GameScene extends Phaser.Scene {
             this.client.send({
                 x: this.player.player.x,
                 y: this.player.player.y,
-                // xB: this.ball.ball.x,
-                // yB: this.ball.ball.y,
+
             }, ball)
         }
         // }, 0)
@@ -474,6 +475,11 @@ export default class GameScene extends Phaser.Scene {
                 this.events.emit('restart', 'lost')
             }
         } else {
+            // xyu
+            blocks = {}
+            countOfBlocks = 0
+            countOfDestroyed = 0
+
             if (looser == 'all block destroyed') {
                 this.events.emit('restart', 'win')
             } else {
@@ -490,6 +496,7 @@ export default class GameScene extends Phaser.Scene {
         if (mode.type == 'multi') {
             if (this.client && !this.client.master && !this.sceneRotated) {
                 // Slave
+                this.stopTimeSkillInitSlave()
                 // Player hp
                 this.hpPlayer1 = this.add.sprite(config.width - 15, config.height - 35, 'HPEnemy').setOrigin(0)
                 this.hpPlayer2 = this.add.sprite(config.width - 65, config.height - 35, 'HPEnemy').setOrigin(0)
@@ -500,6 +507,8 @@ export default class GameScene extends Phaser.Scene {
                 this.hpEnemy3 = this.add.sprite(config.width - 115, config.height - 100, 'HP').setOrigin(0)
             }
             else {
+
+                this.stopTimeSkillInitHost()
                 // Master
                 // Player hp
                 this.hpPlayer1 = this.add.sprite(15, 100, 'HP').setOrigin(0)
@@ -517,6 +526,7 @@ export default class GameScene extends Phaser.Scene {
             this.hpPlayer1 = this.add.sprite(15, 100, 'HP').setOrigin(0)
             this.hpPlayer2 = this.add.sprite(65, 100, 'HP').setOrigin(0)
             this.hpPlayer3 = this.add.sprite(115, 100, 'HP').setOrigin(0)
+            this.stopTimeSkillInitHost()
             this.PLAYER_HP_ARRAY.push(this.hpPlayer1, this.hpPlayer2, this.hpPlayer3)
         }
 
@@ -661,9 +671,6 @@ export default class GameScene extends Phaser.Scene {
         }
     }
 
-
-
-
     // Generate blocs
     generateBlocks() {
 
@@ -698,6 +705,67 @@ export default class GameScene extends Phaser.Scene {
             }
 
         })
+    }
+    stopTimeSkillInitHost() {
+        console.log('init stop skill host')
+
+        let w = config.width
+        let h = config.height
+
+        this.zone_time = this.add.zone(w - 280, h - 280, 160, 160)
+        this.zone_time.setDepth(this.depth.UI)
+        this.zone_time.setScrollFactor(0)
+
+        this.timeDebug = this.add.sprite(w - 280, h - 280, 'time-skill')
+        this.timeDebug.setScrollFactor(0)
+        this.timeDebug.setDepth(this.depth.UI)
+
+
+        // Add input callback
+        this.zone_time.setInteractive()
+        this.zone_time.on('pointerdown', this.stopTimeActivate, this)
+    }
+    stopTimeSkillInitSlave() {
+        console.log('init stop skill slave')
+        let w = config.width
+        let h = config.height
+
+        this.zone_time = this.add.zone(280, 280, 160, 160)
+        this.zone_time.setDepth(this.depth.UI)
+        this.zone_time.setScrollFactor(0)
+
+        this.timeDebug = this.add.sprite(280, 280, 'time-skill')
+        this.timeDebug.setScrollFactor(0)
+        this.timeDebug.setDepth(this.depth.UI)
+
+
+        // Add input callback
+        this.zone_time.setInteractive()
+        this.zone_time.on('pointerdown', this.stopTimeActivate, this)
+    }
+    stopTimeActivate() {
+        // Если время пока не остановлено -> останавливаем его
+        if (!this.timeStop) {
+            this.timeStop = true
+            this.timeDebug.alpha = 0.2
+            console.log('stop game activate!')
+
+            this.LAST_POSITION.x = this.ball.ball.x
+            this.LAST_POSITION.y = this.ball.ball.y
+
+
+            setTimeout(() => {
+                console.log('Time goes itself turn!')
+                this.timeStop = false
+            }, 1000)
+
+            setTimeout(() => {
+                this.timeDebug.alpha = 1
+                console.log('Reload skill time!')
+            }, 5000)
+
+        }
+
     }
 
 }
