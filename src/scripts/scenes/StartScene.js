@@ -31,12 +31,10 @@ class StartScene extends Phaser.Scene {
     this.button2.on('pointerdown', this.requestGame, this)
   }
   createButtons() {
-    this.button1 = this.add.sprite(config.width / 2, config.height / 3 - 150 + 50, 'btnSingle').setOrigin(0, 0) // ???
-      .setOrigin(0.5)
+    this.button1 = this.add.sprite(config.width / 2, config.height / 2 - 150, 'btnSingle').setOrigin(0.5)
       .setInteractive()
 
-    this.button2 = this.add.sprite(config.width / 2, config.height * 2 / 3 - 150, 'btnTwo').setOrigin(0, 0) // ???
-      .setOrigin(0.5)
+    this.button2 = this.add.sprite(config.width / 2, config.height / 2 + 150, 'btnTwo').setOrigin(0.5)
       .setInteractive()
 
 

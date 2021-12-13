@@ -6,11 +6,13 @@ import Ball from "../classes/Ball"
 import { mode } from './StartScene'
 import Util from '../classes/Utils'
 
-
-
+let blocks = {}
+let countOfBlocks = 0
+let countOfDestroyed = 0
 export default class GameScene extends Phaser.Scene {
     constructor() {
         super('Game')
+
         this.GAMES_STATES = { 'PREPARATION': 'PREPARATION', 'START': 'START', 'TRY': 'TRY', 'FINISH': 'FINISH' }
         this.PLATFORMS = {
             PLAYER_PLATFORM: {
@@ -22,6 +24,7 @@ export default class GameScene extends Phaser.Scene {
                 position: 'enemy'
             }
         }
+
     }
     // hook receive args from scene call
     init(obj) {
@@ -67,8 +70,8 @@ export default class GameScene extends Phaser.Scene {
         this.isCountdownComplete = false
         this.isBugBottom = false
         this.isBugTop = false
-    }
 
+    }
     setPhysicsWorld() {
         this.matter.world.setBounds().disableGravity()
 
@@ -126,7 +129,6 @@ export default class GameScene extends Phaser.Scene {
             }
         })
     }
-
     setCameraRotationSettings() {
         this.cam = this.cameras.main
         this.cameras.main.setBounds(0, 0, 1024, 1024)
@@ -134,7 +136,6 @@ export default class GameScene extends Phaser.Scene {
         this.cameras.main.centerToBounds()
 
     }
-
     setTouchControls() {
         this.depth = {
             floor: 0,
@@ -149,7 +150,6 @@ export default class GameScene extends Phaser.Scene {
         }
     }
     setKeyboardControls() {
-
     }
     createMap() {
         this.map = new Map(this)
@@ -220,6 +220,7 @@ export default class GameScene extends Phaser.Scene {
 
         this.initLabels()
         this.setEvents()
+        this.generateBlocks()
 
         // Multi mode has actived
         if (this.client && mode.type == 'multi') {
@@ -431,7 +432,6 @@ export default class GameScene extends Phaser.Scene {
         this.gameState = this.GAMES_STATES['START']
         this.gameIsProcessing = true
     }
-
     onRestart(conditionGame) {
         console.log('GO to finish')
 
@@ -452,7 +452,6 @@ export default class GameScene extends Phaser.Scene {
         }
 
     }
-
     globalRestart(looser) {
         console.log('In this game is looser : ', looser)
 
@@ -475,7 +474,11 @@ export default class GameScene extends Phaser.Scene {
                 this.events.emit('restart', 'lost')
             }
         } else {
-            this.events.emit('restart', 'lost')
+            if (looser == 'all block destroyed') {
+                this.events.emit('restart', 'win')
+            } else {
+                this.events.emit('restart', 'lost')
+            }
         }
 
         // Сбрасываем показатели жизни до исходных и останавливаем игровой процесс
@@ -483,18 +486,6 @@ export default class GameScene extends Phaser.Scene {
         this.enemyHP = 3
         this.gameIsProcessing = false
     }
-
-
-
-
-
-
-
-
-
-
-
-
     initLabels() {
         if (mode.type == 'multi') {
             if (this.client && !this.client.master && !this.sceneRotated) {
@@ -557,7 +548,6 @@ export default class GameScene extends Phaser.Scene {
         console.log('delete enemy hp')
         this.ENEMY_HP_ARRAY.pop().destroy()
     }
-
     // Controls....................
     createControlsHost() {
         // Create zones for input
@@ -638,7 +628,6 @@ export default class GameScene extends Phaser.Scene {
         this.zone_right.on('pointerout', this.releaseRight, this)
     }
 
-
     holdLeft() {
         this.is_holding.left = true
         this.is_holding.direction = 'left'
@@ -672,5 +661,43 @@ export default class GameScene extends Phaser.Scene {
         }
     }
 
+
+
+
+    // Generate blocs
+    generateBlocks() {
+
+        countOfBlocks = Math.floor(2 + Math.random() * 3) // 2 - 4
+        console.log('Random: ', countOfBlocks)
+
+
+        let sizeBlock = 128
+        for (let i = 0; i < countOfBlocks; i++) {
+            let block = this.matter.add.image((config.width / countOfBlocks + sizeBlock / 2) + i * sizeBlock + i * sizeBlock, 150, 'blockstone', null, { isStatic: true }).setOrigin(0.5)
+            block.name = `block${i}`
+            blocks[`block${i}`] = block
+        }
+
+        this.matter.world.on('collisionstart', (event, bodyA, bodyB) => {
+            if (mode.type == 'single') {
+                if (bodyB.gameObject && bodyB.gameObject.type == 'Image') {
+                    blocks[bodyB.gameObject.name].destroy()
+                    countOfDestroyed = countOfDestroyed + 1
+                    console.log('Destroyed: ', countOfDestroyed)
+                    console.log('Total : ', countOfBlocks)
+
+                    if (countOfDestroyed >= countOfBlocks) {
+                        console.log('You are win!')
+                        this.globalRestart('all block destroyed')
+                    }
+
+                }
+                /* if (bodyB.gameObject && bodyB.gameObject.type == 'Image') {
+                    console.log('bodyB : ', bodyA.gameObject)
+                } */
+            }
+
+        })
+    }
 
 }

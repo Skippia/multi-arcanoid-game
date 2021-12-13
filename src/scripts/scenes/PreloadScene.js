@@ -16,6 +16,7 @@ import HPEnemy from '../../assets/enemy-hp.png'
 import time3 from '../../assets/time3.png'
 import time2 from '../../assets/time2.png'
 import time1 from '../../assets/time1.png'
+import blockstone from '../../assets/blockstone.png'
 
 
 
@@ -37,6 +38,7 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.image('time3', time3)
         this.load.image('time2', time2)
         this.load.image('time1', time1)
+        this.load.image('blockstone', blockstone)
 
 
 

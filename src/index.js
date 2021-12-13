@@ -1,7 +1,7 @@
 import Phaser from "phaser"
 import BootScene from './scripts/scenes/BootScene'
 import PreloadScene from './scripts/scenes/PreloadScene'
-import {StartScene} from "./scripts/scenes/StartScene"
+import { StartScene } from "./scripts/scenes/StartScene"
 import GameScene from './scripts/scenes/GameScene'
 import WinFinishScene from "./scripts/scenes/WinFinishScene"
 import LostFinishScene from "./scripts/scenes/LostFinishScene"
@@ -16,6 +16,7 @@ const config = {
         autoCenter: Phaser.Scale.CENTER_BOTH
     },
     physics: {
+
         default: 'matter',
         matter: {
             debug: true,
