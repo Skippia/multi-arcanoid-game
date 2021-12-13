@@ -139,6 +139,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     setCameraRotationSettings() {
+        this.cam = this.cameras.main
         this.cameras.main.setBounds(0, 0, 1024, 1024)
         this.cursors = this.input.keyboard.createCursorKeys()
         this.cameras.main.centerToBounds()
@@ -179,75 +180,76 @@ export default class GameScene extends Phaser.Scene {
         this.events.on('enemyLose', this.reloadSublevelEnemy, this)
         this.events.on('enemyLostSayToSlave', this.enemyLostSayToSlave, this)
     }
+    setClientEvents() {
+        this.client.on('data', data => {
+            this.enemy.player.setX(data.x)
+            this.enemy.player.setY(data.y)
+        })
+        this.client.on('dataBall', ball => {
+            this.ball.ball.setX(ball.x)
+            this.ball.ball.setY(ball.y)
+        })
+
+        this.client.on('playerHP', playerHP => {
+            // Если игра еще не была перезапущена, то начинаем ее перезапуск и выключаем этот флаг
+            this.playerHP = playerHP
+            console.log('New playerHP: ', this.playerHP)
+            if (this.playerHP >= 0) {
+                this.reloadSublevelPlayerHelp()
+            } else {
+                // Игрок проиграл (рестарт для slave)
+                this.globalRestart('playerLost')
+            }
+        })
+        this.client.on('enemyHP', enemyHP => {
+
+            this.enemyHP = enemyHP
+            console.log('New enemyHP: ', this.enemyHP)
+            if (this.enemyHP >= 0) {
+                this.reloadSublevelEnemyHelp()
+            } else {
+                // Враг проиграл (рестарт для slave)
+                // Начинаем перезапуск игры
+                this.globalRestart('enemyLost')
+            }
+
+        })
+    }
 
     create() {
         console.log('hello to game scene')
         console.log('Mode is : ', mode)
-
         this.setBaseConfig()
         this.setCameraRotationSettings()
-        var cam = this.cameras.main
-
         this.setPhysicsWorld()
         this.setTouchControls()
-
         this.createMap()
         this.createBall()
+
+        // Single mode initialization
         this.createPlayer()
         this.initLabels()
         this.setEvents()
 
+        // Multi mode has actived
         if (this.client && mode.type == 'multi') {
-            console.log('Multi player is active')
+            console.log('Multi mode has actived...')
+
+            // Create enemy platform
             this.enemy = new Player(this, this.map, this.platform.enemy)
-            this.client.on('data', data => {
-                this.enemy.player.setX(data.x)
-                this.enemy.player.setY(data.y)
-            })
-            this.client.on('dataBall', ball => {
-                this.ball.ball.setX(ball.x)
-                this.ball.ball.setY(ball.y)
-            })
+            this.setClientEvents()
 
-            this.client.on('playerHP', playerHP => {
-                // Если игра еще не была перезапущена, то начинаем ее перезапуск и выключаем этот флаг
-                this.playerHP = playerHP
-                console.log('New playerHP: ', this.playerHP)
-                if (this.playerHP >= 0) {
-                    this.reloadSublevelPlayerHelp()
-                } else {
-                    // Игрок проиграл (рестарт для slave)
-                    this.globalRestart('playerLost')
-                }
-            })
-            this.client.on('enemyHP', enemyHP => {
-
-                this.enemyHP = enemyHP
-                console.log('New enemyHP: ', this.enemyHP)
-                if (this.enemyHP >= 0) {
-                    this.reloadSublevelEnemyHelp()
-                } else {
-                    // Враг проиграл (рестарт для slave)
-                    // Начинаем перезапуск игры
-                    this.globalRestart('enemyLost')
-                }
-
-            })
-
+        } else {
+            console.log('Single mode has actived...')
         }
 
-
-
-
-
-
-
+        // Initialization controls touch + rotating slave screen
         if (this.client && !this.client.master && !this.sceneRotated && mode.type == 'multi') {
             console.log('Create controls for slave')
             this.createControlsSlave()
 
             this.sceneRotated = true
-            cam.rotation = Math.PI
+            this.cam.rotation = Math.PI
             this.hpPlayer1.setAngle(180)
             this.hpPlayer2.setAngle(180)
             this.hpPlayer3.setAngle(180)
@@ -256,14 +258,10 @@ export default class GameScene extends Phaser.Scene {
             this.hpEnemy2.setAngle(180)
             this.hpEnemy3.setAngle(180)
         } else {
-            console.log('Create controls for host')
+            console.log('Create controls for host | for single mode')
             this.createControlsHost()
         }
 
-        /*  this.events.on('playerLose', this.reloadSublevelPlayer, this)
-         this.events.on('playerLostSayToSlave', this.playerLostSayToSlave, this)
-         this.events.on('enemyLose', this.reloadSublevelEnemy, this)
-         this.events.on('enemyLostSayToSlave', this.enemyLostSayToSlave, this) */
         this.startCountdown()
     }
     removePlayerOneHP() {
