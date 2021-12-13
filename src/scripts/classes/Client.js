@@ -46,7 +46,7 @@ export default class Client extends Phaser.Events.EventEmitter {
     // End group socket on events
   }
   send(data, ball) {
-    // Отправляем новое положение мяча только если оно отличается от старого
+    // Отправляем новое положение платформ только если оно отличается от старого
     if (JSON.stringify(data) !== JSON.stringify(this.sent) && mode.type == 'multi') {
       this.sent = data
       this.socket.emit('playerMove', data)

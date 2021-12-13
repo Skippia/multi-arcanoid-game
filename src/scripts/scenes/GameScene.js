@@ -68,18 +68,7 @@ export default class GameScene extends Phaser.Scene {
         this.isBugBottom = false
         this.isBugTop = false
     }
-    runMultiMode() {
 
-    }
-    runSingleMode() {
-
-    }
-    initHost() {
-
-    }
-    initSlave() {
-
-    }
     setPhysicsWorld() {
         this.matter.world.setBounds().disableGravity()
 
@@ -228,6 +217,7 @@ export default class GameScene extends Phaser.Scene {
 
         // Single mode initialization
         this.createPlayer()
+
         this.initLabels()
         this.setEvents()
 
@@ -237,6 +227,7 @@ export default class GameScene extends Phaser.Scene {
 
             // Create enemy platform
             this.enemy = new Player(this, this.map, this.platform.enemy)
+            // Set client events to share state objects
             this.setClientEvents()
 
         } else {
@@ -262,21 +253,10 @@ export default class GameScene extends Phaser.Scene {
             this.createControlsHost()
         }
 
+        // Start countdown of starting game
         this.startCountdown()
     }
-    removePlayerOneHP() {
-        // Удаляем одну жизнь
-        console.log('delete player hp')
-        if (this.PLAYER_HP_ARRAY.length > 0) {
-            this.PLAYER_HP_ARRAY.pop().destroy()
-        }
-    }
-    removeEnemyOneHP() {
-        // Удаляем одну жизнь
 
-        console.log('delete enemy hp')
-        this.ENEMY_HP_ARRAY.pop().destroy()
-    }
     reloadSublevelPlayer() {
         if (!this.isBugBottom) {
             this.isBugBottom = true
@@ -341,9 +321,10 @@ export default class GameScene extends Phaser.Scene {
         this.startCountdown()
     }
     update() {
-
         if (this.client && this.client.master || mode.type == 'single') {
-            // Регулирует скорость мяча только хост
+            // Регулирует скорость мяча только хост или single player
+
+            // Если игра уже идет, регулируем скорость мяча
             if (this.gameIsProcessing) {
                 this.ball.adjuctSpeedBall()
             }
@@ -351,19 +332,15 @@ export default class GameScene extends Phaser.Scene {
             this.ball.checkBallPosition()
 
             if (this.timeStop == true) {
-
                 /* if (this.firstPassT) {
                 this.LAST_POSITION = { x: this.ball.ball.x, y: this.ball.ball.y }
                 console.log(this.LAST_POSITION)
-
                 this.firstPassT = false
                 } */
                 this.ball.ball.x = this.LAST_POSITION.x
                 this.ball.ball.y = this.LAST_POSITION.y
             }
-
         }
-
 
         // Порталы отслеживает каждый клиент
         if (this.lastPortal && this.lastPortal.gameObject) {
@@ -371,70 +348,37 @@ export default class GameScene extends Phaser.Scene {
                 this.angle += 9
                 this.lastPortal.gameObject.setAngle(this.angle)
             }
-
         }
 
         // Положение платформ отслеживается обоими клиентами
         this.player.move()
 
+        // Если это режим мультиплеера, то синхронизируем состояния платформ и мяча
         if (mode.type == 'multi') {
             this.sync()
         }
     }
     sync() {
         // Синхронизирование движения происходит только в режиме мультиплеер
-
         let ball = null
+        // Если это хост, то сохраняем координаты мяча
         if (this.client.master) {
             ball = this.player.ball
         }
-        setTimeout(() => {
-            if (this.client && this.client.send) {
-                this.client.send({
-                    x: this.player.player.x,
-                    y: this.player.player.y,
-                    // xB: this.ball.ball.x,
-                    // yB: this.ball.ball.y,
-                }, ball)
-            }
-        }, 0)
-
-    }
-    initLabels() {
-        if (mode.type == 'multi') {
-            if (this.client && !this.client.master && !this.sceneRotated) {
-                // Slave
-                // Player hp
-                this.hpPlayer1 = this.add.sprite(config.width - 15, config.height - 35, 'HPEnemy').setOrigin(0)
-                this.hpPlayer2 = this.add.sprite(config.width - 65, config.height - 35, 'HPEnemy').setOrigin(0)
-                this.hpPlayer3 = this.add.sprite(config.width - 115, config.height - 35, 'HPEnemy').setOrigin(0)
-                // Enemy hp
-                this.hpEnemy1 = this.add.sprite(config.width - 15, config.height - 100, 'HP').setOrigin(0)
-                this.hpEnemy2 = this.add.sprite(config.width - 65, config.height - 100, 'HP').setOrigin(0)
-                this.hpEnemy3 = this.add.sprite(config.width - 115, config.height - 100, 'HP').setOrigin(0)
-            }
-            else {
-                // Master
-                // Player hp
-                this.hpPlayer1 = this.add.sprite(15, 100, 'HP').setOrigin(0)
-                this.hpPlayer2 = this.add.sprite(65, 100, 'HP').setOrigin(0)
-                this.hpPlayer3 = this.add.sprite(115, 100, 'HP').setOrigin(0)
-                // Enemy hp
-                this.hpEnemy1 = this.add.sprite(15, 35, 'HPEnemy').setOrigin(0)
-                this.hpEnemy2 = this.add.sprite(65, 35, 'HPEnemy').setOrigin(0)
-                this.hpEnemy3 = this.add.sprite(115, 35, 'HPEnemy').setOrigin(0)
-            }
-            this.PLAYER_HP_ARRAY.push(this.hpPlayer1, this.hpPlayer2, this.hpPlayer3)
-            this.ENEMY_HP_ARRAY.push(this.hpEnemy1, this.hpEnemy2, this.hpEnemy3)
-
-        } else if (mode.type == 'single') {
-            this.hpPlayer1 = this.add.sprite(15, 100, 'HP').setOrigin(0)
-            this.hpPlayer2 = this.add.sprite(65, 100, 'HP').setOrigin(0)
-            this.hpPlayer3 = this.add.sprite(115, 100, 'HP').setOrigin(0)
-            this.PLAYER_HP_ARRAY.push(this.hpPlayer1, this.hpPlayer2, this.hpPlayer3)
+        // setTimeout(() => {
+        // Отрправляем информацию о платформах и о мяче
+        if (this.client && this.client.send) {
+            this.client.send({
+                x: this.player.player.x,
+                y: this.player.player.y,
+                // xB: this.ball.ball.x,
+                // yB: this.ball.ball.y,
+            }, ball)
         }
+        // }, 0)
 
     }
+
     startCountdown() {
         this.gameIsProcessing = false
         let time3 = this.add.sprite(config.width / 2, config.height / 2, 'time3')
@@ -466,18 +410,17 @@ export default class GameScene extends Phaser.Scene {
             this.angle = 0
             this.lastPortal = {}
             this.gameState = this.GAMES_STATES['START']
-            this.startGame()
+            this.initStartGame()
         }
 
         // Игра запускается только один раз - когда флаг gameIsProcessing = false
         if (this.gameState == 'START' && !this.gameIsProcessing) {
+            console.log('start game 420')
 
-
-            this.startGame()
+            this.initStartGame()
         }
-        // })
     }
-    startGame() {
+    initStartGame() {
         // Задаем рандомную скорость и направление полета мяча из стартовой позции в центре экрана
         let randomSpectrum = [-1, 1]
         let speedX = randomSpectrum[Math.round(Math.random())] * (5 + Math.random() * this.ball.SPEED_HORIZONTAL)
@@ -499,12 +442,9 @@ export default class GameScene extends Phaser.Scene {
             this.client.socket.close()
             setTimeout(() => {
                 this.client = {}
-            }, 50)
+            }, 150)
         }
 
-
-
-        // Игра была успешно перезапущена, поэтому теперь ее вновь можно будет перезапустить в будущем
         if (conditionGame == 'win') {
             this.scene.start('WinFinish')
         } else if (conditionGame == 'lost') {
@@ -512,25 +452,9 @@ export default class GameScene extends Phaser.Scene {
         }
 
     }
-    findOpposePortal(name) {
-        if (name.split('').includes('2')) {
-            if (name.endsWith('start')) {
-                return 'portal2-end'
-            } else {
-                return 'portal2-start'
-            }
-        } else {
-            if (name.endsWith('start')) {
-                return 'portal3-end'
-            } else {
-                return 'portal3-start'
-            }
-        }
-    }
+
     globalRestart(looser) {
         console.log('In this game is looser : ', looser)
-        let config = null
-        let configScreen = [{ 'master': 'win', 'slave': 'lost' }, { 'master': 'lost', 'slave': 'win' }]
 
         if (mode.type == 'multi') {
             if (looser == 'playerLost' && this.client && this.client.master) {
@@ -571,9 +495,68 @@ export default class GameScene extends Phaser.Scene {
 
 
 
+    initLabels() {
+        if (mode.type == 'multi') {
+            if (this.client && !this.client.master && !this.sceneRotated) {
+                // Slave
+                // Player hp
+                this.hpPlayer1 = this.add.sprite(config.width - 15, config.height - 35, 'HPEnemy').setOrigin(0)
+                this.hpPlayer2 = this.add.sprite(config.width - 65, config.height - 35, 'HPEnemy').setOrigin(0)
+                this.hpPlayer3 = this.add.sprite(config.width - 115, config.height - 35, 'HPEnemy').setOrigin(0)
+                // Enemy hp
+                this.hpEnemy1 = this.add.sprite(config.width - 15, config.height - 100, 'HP').setOrigin(0)
+                this.hpEnemy2 = this.add.sprite(config.width - 65, config.height - 100, 'HP').setOrigin(0)
+                this.hpEnemy3 = this.add.sprite(config.width - 115, config.height - 100, 'HP').setOrigin(0)
+            }
+            else {
+                // Master
+                // Player hp
+                this.hpPlayer1 = this.add.sprite(15, 100, 'HP').setOrigin(0)
+                this.hpPlayer2 = this.add.sprite(65, 100, 'HP').setOrigin(0)
+                this.hpPlayer3 = this.add.sprite(115, 100, 'HP').setOrigin(0)
+                // Enemy hp
+                this.hpEnemy1 = this.add.sprite(15, 35, 'HPEnemy').setOrigin(0)
+                this.hpEnemy2 = this.add.sprite(65, 35, 'HPEnemy').setOrigin(0)
+                this.hpEnemy3 = this.add.sprite(115, 35, 'HPEnemy').setOrigin(0)
+            }
+            this.PLAYER_HP_ARRAY.push(this.hpPlayer1, this.hpPlayer2, this.hpPlayer3)
+            this.ENEMY_HP_ARRAY.push(this.hpEnemy1, this.hpEnemy2, this.hpEnemy3)
 
+        } else if (mode.type == 'single') {
+            this.hpPlayer1 = this.add.sprite(15, 100, 'HP').setOrigin(0)
+            this.hpPlayer2 = this.add.sprite(65, 100, 'HP').setOrigin(0)
+            this.hpPlayer3 = this.add.sprite(115, 100, 'HP').setOrigin(0)
+            this.PLAYER_HP_ARRAY.push(this.hpPlayer1, this.hpPlayer2, this.hpPlayer3)
+        }
 
-
+    }
+    findOpposePortal(name) {
+        if (name.split('').includes('2')) {
+            if (name.endsWith('start')) {
+                return 'portal2-end'
+            } else {
+                return 'portal2-start'
+            }
+        } else {
+            if (name.endsWith('start')) {
+                return 'portal3-end'
+            } else {
+                return 'portal3-start'
+            }
+        }
+    }
+    removePlayerOneHP() {
+        // Удаляем одну жизнь
+        console.log('delete player hp')
+        if (this.PLAYER_HP_ARRAY.length > 0) {
+            this.PLAYER_HP_ARRAY.pop().destroy()
+        }
+    }
+    removeEnemyOneHP() {
+        // Удаляем одну жизнь
+        console.log('delete enemy hp')
+        this.ENEMY_HP_ARRAY.pop().destroy()
+    }
 
     // Controls....................
     createControlsHost() {
