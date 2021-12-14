@@ -8,9 +8,9 @@ export default class Ball {
     this.playerCheckpointFirstEntrance = true
     this.enemyCheckpointFirstEntrance = true
     this.DIRECTIONS_HORIZONTAL = Object.freeze({ BACKWARD: -1, NONE: 0, FORWARD: 1 })
-    this.SPEED_HORIZONTAL = 15
+    this.SPEED_HORIZONTAL = 7
     this.DIRECTIONS_VERTICAL = Object.freeze({ BACKWARD: -1, NONE: 0, FORWARD: 1 })
-    this.SPEED_VERTICAL = 15
+    this.SPEED_VERTICAL = 7
 
     this.ball = this.scene.matter.add.sprite(config.width / 2, config.height / 2, 'objects', 'ball')
     this.ball.setIgnoreGravity(true)
@@ -18,7 +18,7 @@ export default class Ball {
     this.ball.setFriction(0, 0, 0)
 
   }
-  
+
   adjuctSpeedBall() {
     const { x, y } = this.ball.body.velocity
     let signX = x / Math.abs(x)
