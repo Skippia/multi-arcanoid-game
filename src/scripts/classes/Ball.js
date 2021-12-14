@@ -18,9 +18,7 @@ export default class Ball {
     this.ball.setFriction(0, 0, 0)
 
   }
-  created() {
-
-  }
+  
   adjuctSpeedBall() {
     const { x, y } = this.ball.body.velocity
     let signX = x / Math.abs(x)

@@ -4,7 +4,6 @@ import Map from '../classes/Map'
 import Player from "../classes/Player"
 import Ball from "../classes/Ball"
 import { mode } from './StartScene'
-import Util from '../classes/Utils'
 
 let blocks = {}
 let countOfBlocks = 0
@@ -172,6 +171,38 @@ export default class GameScene extends Phaser.Scene {
         this.player = new Player(this, this.map, this.platform.player)
         this.player.ball = this.ball.ball
     }
+    createBtnReturnHost() {
+        let btnReturn = this.add.sprite(75, 205, 'btnReturn').setInteractive()
+        btnReturn.on('pointerdown', this.backToMenu, this)
+    }
+    createBtnReturnSlave() {
+        let btnReturn = this.add.sprite(config.width - 75, config.height - 205, 'btnReturn').setInteractive()
+        btnReturn.setAngle(180)
+        btnReturn.on('pointerdown', this.backToMenu, this)
+    }
+    backToMenu() {
+
+        // Multi
+        if (this.client && this.client.socket) {
+            this.client.socket.close()
+            setTimeout(() => {
+                this.client = {}
+            }, 150)
+            this.playerHP = 3
+            this.enemyHP = 3
+            this.gameIsProcessing = false
+        }
+        // Single
+        else {
+            blocks = {}
+            countOfBlocks = 0
+            countOfDestroyed = 0
+
+        }
+        console.log('Btn back to menu')
+
+        this.scene.start('Start')
+    }
     setEvents() {
         this.events.on('restart', this.onRestart, this)
         this.events.on('playerLose', this.reloadSublevelPlayer, this)
@@ -223,6 +254,7 @@ export default class GameScene extends Phaser.Scene {
     create() {
         // console.log('hello to game scene')
         // console.log('Mode is : ', mode)
+
         this.setBaseConfig()
         this.setCameraRotationSettings()
         this.setPhysicsWorld()
@@ -254,6 +286,7 @@ export default class GameScene extends Phaser.Scene {
         if (this.client && !this.client.master && !this.sceneRotated && mode.type == 'multi') {
             // console.log('Create controls for slave')
             this.createControlsSlave()
+            this.createBtnReturnSlave()
 
             this.sceneRotated = true
             this.cam.rotation = Math.PI
@@ -265,9 +298,20 @@ export default class GameScene extends Phaser.Scene {
             this.hpEnemy2.setAngle(180)
             this.hpEnemy3.setAngle(180)
             this.timeDebug.setAngle(180)
+            console.log('Set velocity slave 0')
+
+            this.ball.ball.setVelocity(0)
+            this.ball.ball.setStatic(true)
+
+            console.log(this.ball.ball.body.velocity)
+            setTimeout(() => {
+                console.log(this.ball.ball.body.velocity)
+
+            }, 3500)
         } else {
             // console.log('Create controls for host | for single mode')
             this.createControlsHost()
+            this.createBtnReturnHost()
         }
 
         // Start countdown of starting game
@@ -405,6 +449,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     startCountdown() {
+        this.timeSkillBtnReady = false
         this.gameIsProcessing = false
         let time3 = this.add.sprite(config.width / 2, config.height / 2, 'time3')
         if (this.client && !this.client.master && mode.type == 'multi') {
@@ -426,6 +471,7 @@ export default class GameScene extends Phaser.Scene {
                     time1.destroy()
                     this.isCountdownComplete = true
                     this.checkIsPreparationGame()
+                    this.timeSkillBtnReady = true
                 }, 1000)
             }, 1000)
         }, 1000)
@@ -448,8 +494,8 @@ export default class GameScene extends Phaser.Scene {
     initStartGame() {
         // Задаем рандомную скорость и направление полета мяча из стартовой позции в центре экрана
         let randomSpectrum = [-1, 1]
-        let speedX = randomSpectrum[Math.round(Math.random())] * (5 + Math.random() * this.ball.SPEED_HORIZONTAL)
-        let speedY = randomSpectrum[Math.round(Math.random())] * (5 + Math.random() * this.ball.SPEED_VERTICAL)
+        let speedX = randomSpectrum[Math.round(Math.random())] * (0 + Math.random() * this.ball.SPEED_HORIZONTAL)
+        let speedY = randomSpectrum[Math.round(Math.random())] * (0 + Math.random() * this.ball.SPEED_VERTICAL)
         this.ball.ball.setVelocity(speedX, speedY)
 
         // Начинаем игровой процесс

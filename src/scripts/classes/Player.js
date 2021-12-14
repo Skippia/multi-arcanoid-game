@@ -7,8 +7,6 @@ export default class Player {
         this.map = map
         this.DIRECTIONS_HORIZONTAL = Object.freeze({ BACKWARD: -1, NONE: 0, FORWARD: 1 })
         this.SPEED_HORIZONTAL = 20
-        this.DIRECTIONS_VERTICAL = Object.freeze({ BACKWARD: -1, NONE: 0, FORWARD: 1 })
-        this.SPEED_VERTICAL = 10
 
         // Получаем положение платформы
         const position = this.map.getPlayerPosition(config.position)

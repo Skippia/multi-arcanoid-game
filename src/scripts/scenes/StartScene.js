@@ -8,6 +8,7 @@ class StartScene extends Phaser.Scene {
     super('Start')
   }
   create() {
+    this.countOfStarts = 0
     // console.log('StartScene.create')
     this.createBackground()
     // this.createText()
@@ -52,12 +53,16 @@ class StartScene extends Phaser.Scene {
     this.scene.start('Game', obj)
   }
   requestGame() {
-    // инициализировать клиент
-    this.client = new Client()
-    // отправить запрос игры на сервер
-    this.client.init()
-    //  по факту получения противника  начать игру
-    this.client.on('game', this.startMultiGame, this)
+    if (this.countOfStarts == 0) {
+      this.countOfStarts++
+      // инициализировать клиент
+      this.client = new Client()
+      // отправить запрос игры на сервер
+      this.client.init()
+      //  по факту получения противника  начать игру
+      this.client.on('game', this.startMultiGame, this)
+    }
+
   }
 }
 export { StartScene, mode }

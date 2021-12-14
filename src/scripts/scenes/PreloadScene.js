@@ -18,6 +18,7 @@ import time2 from '../../assets/time2.png'
 import time1 from '../../assets/time1.png'
 import blockstone from '../../assets/blockstone.png'
 import timeSkill from '../../assets/time-skill.png'
+import btnReturn from '../../assets/return.png'
 
 
 
@@ -41,6 +42,7 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.image('time1', time1)
         this.load.image('blockstone', blockstone)
         this.load.image('time-skill', timeSkill)
+        this.load.image('btnReturn', btnReturn)
 
 
 
